@@ -1,16 +1,23 @@
-# This is a sample Python script.
+from ollama_client import ask_model
+from repository_reader import read_repository
+from prompt_builder import build_prompt
 
-# Press Maiusc+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+def main():
+
+    repository_path = "repository/mp3-player"
+    files = read_repository(repository_path)
+    print(f"File trovati: {len(files)}")
+
+    prompt = build_prompt(files)
+
+    with open("output/prompt.txt", "w", encoding="utf-8") as file:
+        file.write(prompt)
+
+    response = ask_model(prompt)
+
+    with open("output/README.md", "w", encoding="utf-8") as file:
+        file.write(response)
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+if __name__ == "__main__":
+    main()
