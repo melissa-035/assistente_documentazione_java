@@ -1,16 +1,20 @@
 import os
 
-
-def read_repository(path):
+def read_repository(path, extensions=None):
     files = {}
 
     for root, dirs, filenames in os.walk(path):
 
-        # ignora la cartella .git
+        #ignora la cartella .git
         if ".git" in root:
             continue
 
         for filename in filenames:
+
+            #filtro estensioni
+            if extensions is not None:
+                if not any(filename.endswith(ext) for ext in extensions):
+                    continue
 
             file_path = os.path.join(root, filename)
 
