@@ -1,0 +1,8 @@
+Analyze the Java repository step by step.
+
+First identify the purpose of each class.
+Then analyze relationships between classes.
+Then identify implemented features.
+Finally generate the README.md file.
+
+Show your reasoning before writing the README.

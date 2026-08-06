@@ -1,0 +1,26 @@
+Generate a README.md file for the Java repository
+
+Below is an example of a README generated from a Java repository.
+
+Example:
+
+INPUT STRUCTURE:
+Class:
+AudioManager
+
+Fields:
+- volume: int
+
+Methods:
+- play()
+- stop()
+
+OUTPUT:
+# Audio Manager
+
+## Description
+The AudioManager class manages audio playback...
+
+---
+
+Now generate a README for the following repository:

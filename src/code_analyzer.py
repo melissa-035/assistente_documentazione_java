@@ -22,7 +22,20 @@ def analyze_repository(files):
             "methods": methods
         }
 
-    return analyzed
+    stats = {
+        "files_analyzed": len(analyzed),
+        "classes": len(analyzed),
+        "methods": sum(
+            len(info["methods"])
+            for info in analyzed.values()
+        ),
+        "fields": sum(
+            len(info["fields"])
+            for info in analyzed.values()
+        )
+    }
+
+    return analyzed, stats
 
 
 
