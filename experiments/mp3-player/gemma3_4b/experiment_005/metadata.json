@@ -1,0 +1,14 @@
+{
+    "date": "2026-08-07 09:40:00",
+    "LLM_runtime_seconds": 200.27994561195374,
+    "repository": "mp3-player",
+    "model": "gemma3_4b",
+    "prompt_type": "zero_shot",
+    "prompt_file": "prompts/zero_shot.txt",
+    "prompt_length": 4502,
+    "response_length": 3891,
+    "files_analyzed": 10,
+    "classes": 10,
+    "methods": 77,
+    "fields": 52
+}

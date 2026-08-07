@@ -1,0 +1,14 @@
+{
+    "date": "2026-08-06 21:05:53",
+    "LLM_runtime_seconds": 154.45834040641785,
+    "repository": "mp3-player",
+    "model": "gemma3_4b",
+    "prompt_type": "role_prompting",
+    "prompt_file": "prompts/role_prompting.txt",
+    "prompt_length": 5258,
+    "response_length": 2760,
+    "files_analyzed": 10,
+    "classes": 10,
+    "methods": 77,
+    "fields": 52
+}
