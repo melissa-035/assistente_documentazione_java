@@ -1,10 +1,14 @@
-from pathlib import Path
+from config.config import EXPERIMENTS_DIR
 import json
 
 
 def create_experiment_directory(repository_name, model_name):
 
-    base_dir = Path("experiments") / repository_name / model_name
+    base_dir = (
+        EXPERIMENTS_DIR /
+        repository_name /
+        model_name
+    )
 
     base_dir.mkdir(parents=True, exist_ok=True)
 
