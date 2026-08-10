@@ -18,9 +18,11 @@ def read_repository(path, extensions=None):
 
             file_path = os.path.join(root, filename)
 
+            relative_path = os.path.relpath(file_path, path)
+
             try:
                 with open(file_path, "r", encoding="utf-8") as file:
-                    files[file_path] = file.read()
+                    files[relative_path] = file.read()
 
             except UnicodeDecodeError:
                 # ignora file binari (immagini, ecc.)

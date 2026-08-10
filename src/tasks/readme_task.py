@@ -8,14 +8,12 @@ from src.experiment_manager import create_experiment_directory
 from datetime import datetime
 from config.config import REPOSITORY_DIR
 from config.config import PROMPTS_DIR
+from config.config import PROJECT_ROOT
 
 
-def readme_task():
+def readme_task(repository_name, model_name, prompt_type):
 
     repository_path = (REPOSITORY_DIR/"mp3-player")
-    repository_name = "mp3-player"
-    model_name = "gemma3_4b"
-    prompt_type = "chain_of_thought"
 
     prompt_file =(PROMPTS_DIR/"readme_prompts"/f"{prompt_type}.txt")
 
@@ -46,7 +44,7 @@ def readme_task():
         "repository": repository_name,
         "model": model_name,
         "prompt_type": prompt_type,
-        "prompt_file": prompt_file,
+        "prompt_file": str(prompt_file.relative_to(PROJECT_ROOT)),
         "prompt_length": len(prompt),
         "response_length": len(response),
         "files_analyzed": len(files),

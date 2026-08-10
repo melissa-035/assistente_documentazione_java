@@ -9,12 +9,9 @@ from config.config import REPOSITORY_DIR
 from config.config import PROMPTS_DIR
 
 
-def javadoc_task():
+def javadoc_task(repository_name, model_name, prompt_type):
 
     repository_path = (REPOSITORY_DIR/"mp3-player")
-    repository_name = "mp3-player"
-    model_name = "gemma3_4b"
-    prompt_type = "zero_shot"
 
     prompt_file = (PROMPTS_DIR/"javadoc_prompts"/f"{prompt_type}.txt")
 
