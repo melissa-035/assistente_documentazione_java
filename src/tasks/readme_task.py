@@ -2,9 +2,9 @@ import time
 from src.ollama_client import ask_model
 from src.repository_reader import read_repository
 from src.prompt_builders.readme_prompt_builder import build_prompt
-from src.experiment_manager import save_experiment
+from src.experiment_managers.readme_experiment_manager import save_experiment
 from src.readme_code_analyzer import analyze_repository
-from src.experiment_manager import create_experiment_directory
+from src.experiment_managers.readme_experiment_manager import create_experiment_directory
 from datetime import datetime
 from config.config import REPOSITORY_DIR
 from config.config import PROMPTS_DIR

@@ -4,10 +4,10 @@ from src.tasks.javadoc_task import javadoc_task
 
 def main():
 
-    task = "readme"
+    task = "javadoc"
     repository_name = "mp3-player"
     model_name = "gemma3_4b"
-    prompt_type = "chain_of_thought"
+    prompt_type = "zero_shot"
 
     if task == "readme":
         readme_task(
