@@ -1,0 +1,62 @@
+{
+    "task": "javadoc",
+    "date": "2026-09-30 18:07:04",
+    "repository": "mp3-player",
+    "model": "gemma3_4b",
+    "prompt_type": "few_shot",
+    "prompt_file": "C:\\Users\\Notebook\\Desktop\\musicbridge\\assistente_documentazione_java\\prompts\\javadoc_prompts\\few_shot.txt",
+    "files_analyzed": 10,
+    "total_runtime_seconds": 2370.552664041519,
+    "files": {
+        "src\\AudioPlayer.java": {
+            "runtime_seconds": 160.44907188415527,
+            "prompt_length": 13078,
+            "response_length": 418
+        },
+        "src\\BackupManager.java": {
+            "runtime_seconds": 220.30740594863892,
+            "prompt_length": 5026,
+            "response_length": 3953
+        },
+        "src\\BinaryTrackTree.java": {
+            "runtime_seconds": 129.13591933250427,
+            "prompt_length": 2412,
+            "response_length": 1961
+        },
+        "src\\MusicPlaylistManager.java": {
+            "runtime_seconds": 330.92780780792236,
+            "prompt_length": 21228,
+            "response_length": 5948
+        },
+        "src\\MyHashTable.java": {
+            "runtime_seconds": 325.0837194919586,
+            "prompt_length": 3931,
+            "response_length": 4287
+        },
+        "src\\MyPlaylist.java": {
+            "runtime_seconds": 409.9164991378784,
+            "prompt_length": 8849,
+            "response_length": 5310
+        },
+        "src\\MySet.java": {
+            "runtime_seconds": 70.00421118736267,
+            "prompt_length": 1957,
+            "response_length": 1009
+        },
+        "src\\QuickSort.java": {
+            "runtime_seconds": 272.28071308135986,
+            "prompt_length": 2839,
+            "response_length": 3938
+        },
+        "src\\Track.java": {
+            "runtime_seconds": 367.2434628009796,
+            "prompt_length": 4342,
+            "response_length": 4426
+        },
+        "src\\test\\java\\DataStructureSmokeTest.java": {
+            "runtime_seconds": 85.02411103248596,
+            "prompt_length": 2433,
+            "response_length": 1452
+        }
+    }
+}

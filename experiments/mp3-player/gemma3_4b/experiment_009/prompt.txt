@@ -1,0 +1,266 @@
+Analyze the Java repository step by step.
+
+First identify the purpose of each class.
+Then analyze relationships between classes.
+Then identify implemented features.
+Finally generate the README.md file.
+
+Show your reasoning before writing the README.
+
+--------------------
+FILE: C:\Users\Notebook\Desktop\musicbridge\assistente_documentazione_java\repository\mp3-player\src\AudioPlayer.java
+--------------------
+
+Class:
+AudioPlayer
+
+Fields:
+- fileInpstream: FileInputStream
+- totalLength: long
+- playerInstance: Player
+- playerThread: Thread
+- timeSlider: JSlider
+- currentTrack: Track
+- myPlaylist: MyPlaylist
+- fieldTrackTitle: JTextField
+- skipBackTrack: JButton
+- skipForwardTrack: JButton
+- playPauseButton: JButton
+- albumLabel: JLabel
+- loopButton: JButton
+- isLooping: boolean
+- searchButton: JButton
+- searchField: JTextField
+- shuffleButton: JButton
+
+
+Methods:
+- mouseReleased(MouseEvent e)
+- shouldScroll(int dir)
+- run()
+- run()
+- actionPerformed(ActionEvent e)
+- playOrPause()
+- skipForwardTrack()
+- splitCurrentTrackAndWriteToFile(File outputFile, boolean isToSplit)
+- updateList(MyPlaylist mplaylist)
+- refreshGUI()
+- updateTimerProgress()
+- getCurrentTrack()
+- setCurrentTrack(Track track)
+- getPlayList()
+
+
+--------------------
+FILE: C:\Users\Notebook\Desktop\musicbridge\assistente_documentazione_java\repository\mp3-player\src\BackupManager.java
+--------------------
+
+Class:
+BackupManager
+
+Fields:
+- currentFile: File
+- defaultBrowDirectory: String
+- defaultDirectory: String
+
+
+Methods:
+- saveDefaultsToFile()
+- getDefaultDirectory()
+- setDefaultDirectory(String directory)
+- setDefaultBrowserDir(String path)
+- getDefaultBrowseDirectory()
+
+
+--------------------
+FILE: C:\Users\Notebook\Desktop\musicbridge\assistente_documentazione_java\repository\mp3-player\src\BinaryTrackTree.java
+--------------------
+
+Class:
+BinaryTrackTree
+
+Fields:
+
+
+Methods:
+- find(TreeNode node, String title)
+
+
+--------------------
+FILE: C:\Users\Notebook\Desktop\musicbridge\assistente_documentazione_java\repository\mp3-player\src\MusicPlaylistManager.java
+--------------------
+
+Class:
+MusicPlaylistManager
+
+Fields:
+- albumPanel: JPanel
+- backupManager: BackupManager
+- playlistObject: MyPlaylist
+- songTracksTable: JTable
+- trackTableModel: DefaultTableModel
+- nameTextField: JTextField
+- descriptionTextField: JTextField
+- playlistDescLabelValue: JLabel
+- playlistCountLabelValue: JLabel
+- playlistDurationLabelValue: JLabel
+- playlistNameLabelValue: JLabel
+- addTrackButton: JButton
+- removeTrackButton: JButton
+- createPlayListButton: JButton
+- openExistingButton: JButton
+- savePlayListButton: JButton
+- exitAppButton: JButton
+- audioPlayer: AudioPlayer
+- sortButton: JButton
+- sortByCombo: JComboBox<String>
+
+
+Methods:
+- populateLeftPanel(JPanel leftPanel)
+- windowClosing(WindowEvent evt)
+- isCellEditable(int row, int column)
+- itemStateChanged(ItemEvent arg0)
+- actionPerformed(ActionEvent e)
+- openPlayList()
+- createPlaylist(File playFile)
+- refresh()
+- addToList(File selectedFile)
+- addTracks()
+- updateTrackNumbers()
+- removeTracks()
+- savePlayList()
+- closeApp()
+- textFieldListener(JTextField tf)
+- removeUpdate(DocumentEvent e)
+- insertUpdate(DocumentEvent e)
+- changedUpdate(DocumentEvent e)
+- run()
+
+
+--------------------
+FILE: C:\Users\Notebook\Desktop\musicbridge\assistente_documentazione_java\repository\mp3-player\src\MyHashTable.java
+--------------------
+
+Class:
+MyHashTable
+
+Fields:
+- size: int
+- bucketCount: int
+
+
+Methods:
+- size()
+- isEmpty()
+- remove(K key)
+- get(K key)
+- add(K key, V value)
+
+
+--------------------
+FILE: C:\Users\Notebook\Desktop\musicbridge\assistente_documentazione_java\repository\mp3-player\src\MyPlaylist.java
+--------------------
+
+Class:
+MyPlaylist
+
+Fields:
+- description: String
+- name: String
+- playlistFile: File
+- tracks: ArrayList<Track>
+
+
+Methods:
+- savePlayList(String file)
+- wplParser()
+- checkSaved()
+- getName()
+- getDescription()
+- setName(String name)
+- setDescription(String description)
+- getTracks()
+- getIndexOf(Track track)
+- getTrackById(int id)
+- getById(int index)
+- getLast()
+- getPlayListFile()
+- setPlayListFile(File file)
+- getCount()
+- getDuration()
+- add(Track track)
+- remove(int id)
+- getTrackArray()
+- updateTracks(Track[] ts)
+- swap(int index1, int index2)
+
+
+--------------------
+FILE: C:\Users\Notebook\Desktop\musicbridge\assistente_documentazione_java\repository\mp3-player\src\MySet.java
+--------------------
+
+Class:
+MySet
+
+Fields:
+
+
+Methods:
+- add(Object object)
+- iterator()
+- size()
+
+
+--------------------
+FILE: C:\Users\Notebook\Desktop\musicbridge\assistente_documentazione_java\repository\mp3-player\src\QuickSort.java
+--------------------
+
+Class:
+QuickSort
+
+Fields:
+
+
+Methods:
+- sort(Track array[], int start, int end)
+
+
+--------------------
+FILE: C:\Users\Notebook\Desktop\musicbridge\assistente_documentazione_java\repository\mp3-player\src\Track.java
+--------------------
+
+Class:
+Track
+
+Fields:
+- albumImage: BufferedImage
+- trackFile: File
+- titleStr: String
+- artistStr: String
+- albumStr: String
+- duration: long
+
+
+Methods:
+- getArtist()
+- getTitle()
+- getDuration()
+- getAlbumArt()
+- getAlbum()
+- getTrackFile()
+- hashCode()
+- equals(Object obj)
+
+
+--------------------
+FILE: C:\Users\Notebook\Desktop\musicbridge\assistente_documentazione_java\repository\mp3-player\src\test\java\DataStructureSmokeTest.java
+--------------------
+
+Class:
+DataStructureSmokeTest
+
+Fields:
+
+
+Methods:

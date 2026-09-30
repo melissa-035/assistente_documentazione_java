@@ -1,0 +1,104 @@
+Generate javadoc style comments for the following java class.
+Below is an example of a commented method.
+
+Example:
+
+INPUT:
+        public static <T> Enumeration<T> enumeration(final Collection<T> c) {
+            return new Enumeration<T>() {
+                private final Iterator<T> i = c.iterator();
+
+                public boolean hasMoreElements() {
+                    return i.hasNext();
+                }
+
+                public T nextElement() {
+                    return i.next();
+                }
+            };
+        }
+
+OUTPUT:
+/**
+        * Returns an enumeration over the specified collection.  This provides
+        * interoperability with legacy APIs that require an enumeration
+        * as input.
+        *
+        * @param c the collection for which an enumeration is to be returned.
+        * @return an enumeration over the specified collection.
+        * @see Enumeration
+        */
+       public static <T> Enumeration<T> enumeration(final Collection<T> c) {
+           return new Enumeration<T>() {
+               private final Iterator<T> i = c.iterator();
+
+               public boolean hasMoreElements() {
+                   return i.hasNext();
+               }
+
+               public T nextElement() {
+                   return i.next();
+               }
+           };
+       }
+---
+Now generate javadoc comments for the following class:
+
+
+        
+--------------------
+FILE: src\BinaryTrackTree.java
+--------------------
+
+public class BinaryTrackTree {
+	TreeNode root;
+	BinaryTrackTree()
+	{
+		root = null;
+	}
+
+	BinaryTrackTree(Track value) {
+		root = new TreeNode(value);
+	}
+
+	void insert(Track track) {
+		root = insertHelper(root, track);
+	}
+
+	TreeNode insertHelper(TreeNode node, Track key)
+	{
+		if (node == null) {
+			node = new TreeNode(key);
+			return node;
+		}
+
+		if (key.getTitle().compareTo(node.key.getTitle()) < 0)
+			node.left = insertHelper(node.left, key);
+		else if (key.getTitle().compareTo(node.key.getTitle()) > 0)
+			node.right = insertHelper(node.right, key);
+		return node;
+	}
+
+	public TreeNode find(TreeNode node, String title)
+	{
+		if (node == null || node.key.getTitle().equalsIgnoreCase(title))
+			return node;
+
+		if (node.key.getTitle().compareTo(title) < 0)
+			return find(node.right, title);
+
+		return find(node.left,title);
+	}
+}
+
+class TreeNode {
+	Track key;
+	TreeNode left, right;
+
+	public TreeNode(Track t)
+	{
+		key = t;
+		left = right = null;
+	}
+}
+

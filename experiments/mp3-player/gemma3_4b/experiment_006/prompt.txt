@@ -1,0 +1,1924 @@
+Generate javadoc type comments for the following code:
+        
+--------------------
+FILE: C:\Users\Notebook\Desktop\musicbridge\assistente_documentazione_java\repository\mp3-player\src\AudioPlayer.java
+--------------------
+
+import javazoom.jl.decoder.JavaLayerException;
+import javazoom.jl.player.Player;
+
+import javax.swing.*;
+import javax.swing.plaf.basic.BasicSliderUI;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+@SuppressWarnings("serial")
+public class AudioPlayer extends JPanel implements ActionListener
+{
+	private final Image SHUFFLE_IMAGE = (new ImageIcon(getClass().getResource("/images/shuffle.png"))).getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
+	private final Image LOOP_IMAGE = (new ImageIcon(getClass().getResource("/images/loop.png"))).getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
+	private final Image PLAY_IMAGE = (new ImageIcon(getClass().getResource("/images/play_button.png"))).getImage().getScaledInstance(12, 12, Image.SCALE_SMOOTH);
+	private final Image PAUSE_IMAGE = (new ImageIcon(getClass().getResource("/images/pause_button.png"))).getImage().getScaledInstance(12, 12, Image.SCALE_SMOOTH);
+	private final Image DEFAULT_ALBUM_ART_ICON = (new ImageIcon(getClass().getResource("/images/album.png"))).getImage().getScaledInstance(70, 70, Image.SCALE_SMOOTH);
+
+	private FileInputStream fileInpstream;
+	private long totalLength;
+	private volatile boolean isPausedFlag = false;
+	private Player playerInstance;
+	private Thread playerThread;
+	private JSlider timeSlider;
+	private Track currentTrack;
+	private MyPlaylist myPlaylist;
+	private JTextField fieldTrackTitle;
+	private JButton skipBackTrack;
+	private JButton skipForwardTrack;
+	private JButton playPauseButton;
+	private JLabel albumLabel;
+	private JButton loopButton;
+	private boolean isLooping;
+	private JButton searchButton;
+	private JTextField searchField;
+	private JButton shuffleButton;
+
+	public AudioPlayer(MyPlaylist myPlaylist, JLabel albumLabel)
+	{
+		super();
+		this.myPlaylist = myPlaylist;
+		this.albumLabel = albumLabel;
+		this.setLayout(null);
+		this.albumLabel.setIcon(new ImageIcon(DEFAULT_ALBUM_ART_ICON));
+		Image icon1 = (new ImageIcon(getClass().getResource("/images/back.png"))).getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH);
+		skipBackTrack = new JButton(new ImageIcon(icon1));
+		skipBackTrack.addActionListener(this);
+		skipBackTrack.setBounds(10, 50, 80, 25);
+		add(skipBackTrack);
+
+		playPauseButton = new JButton(new ImageIcon(PLAY_IMAGE));
+		playPauseButton.addActionListener(this);
+		playPauseButton.setBounds(135, 50, 60, 25);
+		add(playPauseButton);
+
+		shuffleButton = new JButton(new ImageIcon(SHUFFLE_IMAGE));
+		shuffleButton.addActionListener(this);
+		shuffleButton.setBounds(10, 125, 60, 25);
+		add(shuffleButton);
+
+		loopButton = new JButton(new ImageIcon(LOOP_IMAGE));
+		loopButton.addActionListener(this);
+		loopButton.setBounds(80, 125, 60, 25);
+		add(loopButton);
+
+		searchField = new JTextField();
+
+		searchField.setBounds(150, 125, 80, 25);
+		add(searchField);
+
+		searchButton = new JButton("Search");
+		searchButton.addActionListener(this);
+		searchButton.setBounds(240, 125, 90, 25);
+		add(searchButton);
+
+		Image icon2 = (new ImageIcon(getClass().getResource("/images/forward.png"))).getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH);
+		skipForwardTrack = new JButton(new ImageIcon(icon2));
+		skipForwardTrack.addActionListener(this);
+		skipForwardTrack.setBounds(240, 50, 80, 25);
+		add(skipForwardTrack);
+
+		fieldTrackTitle = new JTextField();
+		fieldTrackTitle.setBorder(BorderFactory.createEmptyBorder());
+		fieldTrackTitle.setHorizontalAlignment(SwingConstants.CENTER);
+		fieldTrackTitle.setEditable(false);
+		fieldTrackTitle.setBackground(SystemColor.menu);
+		fieldTrackTitle.setBounds(10, 15, 310, 20);
+		add(fieldTrackTitle);
+
+		timeSlider = new JSlider() {
+			{
+				MouseListener[] mouseListeners = getMouseListeners();
+				for (MouseListener l : mouseListeners)
+					removeMouseListener(l);
+				final BasicSliderUI baseUI = (BasicSliderUI) getUI();
+				BasicSliderUI.TrackListener tlistener = baseUI.new TrackListener()
+				{
+					@Override
+					public void mouseReleased(MouseEvent e)
+					{
+						Point point = e.getPoint();
+						int val = baseUI.valueForXPosition(point.x);
+						setValue(val);
+						if (!isPausedFlag)
+						{
+							pauseTrack();
+							setValue(val);
+							resume();
+						}
+					}
+
+					@Override public boolean shouldScroll(int dir) {
+						return false;
+					}
+				};
+				addMouseListener(tlistener);
+			}
+		};
+
+		timeSlider.setValue(0);
+		timeSlider.setBounds(10, 95, 310, 25);
+		add(timeSlider);
+	}
+
+
+	private void playTrack(long initialValue)
+	{
+		if (this.currentTrack != null)
+		{
+			this.isPausedFlag = false;
+			if (playerInstance != null)
+			{
+				playerInstance.close();
+				playerInstance = null;
+			}
+			try
+			{
+				this.fileInpstream = new FileInputStream(this.currentTrack.getTrackFile());
+				this.totalLength = this.fileInpstream.available();
+				this.timeSlider.setMaximum((int) this.totalLength);
+				this.fileInpstream.skip(initialValue);
+				playerInstance = new Player(this.fileInpstream);
+				this.playerThread = new Thread("Audio Player")
+				{
+					public void run()
+					{
+						try
+						{
+							refreshGUI();
+							playPauseButton.setIcon(new ImageIcon(PAUSE_IMAGE));
+							playerInstance.play();
+							if (playerInstance != null && playerInstance.isComplete())
+							{
+								skipForwardTrack();
+							}
+						}
+						catch (JavaLayerException e)
+						{
+							e.printStackTrace();
+						}
+					}
+				};
+
+				this.playerThread.start();
+				Set<Thread> threads = Thread.getAllStackTraces().keySet();
+				for (Thread th : threads)
+				{
+					if (th.getName().equals("Track Timer Thread"))
+					{
+						return;
+					}
+				}
+
+				Thread progressThread = new Thread("Track Timer Thread") {
+					public void run()
+					{
+						while (!this.isInterrupted())
+						{
+							try
+							{
+								if (playerInstance.isComplete() || isPausedFlag)
+								{
+									break;
+								}
+								updateTimerProgress();
+								Thread.sleep(100);
+							}
+							catch (NullPointerException | InterruptedException e)
+							{
+								break;
+							}
+						}
+					}
+				};
+				progressThread.start();
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e)
+	{
+		Object currentSource = e.getSource();
+
+		if (currentSource == skipBackTrack)
+		{
+			skipBackTrack();
+		}
+		else if (currentSource == playPauseButton)
+		{
+			playOrPause();
+		}
+		else if (currentSource == skipForwardTrack)
+		{
+			skipForwardTrack();
+		}
+		else if (currentSource == loopButton)
+		{
+			loopTrack();
+		}
+		else if (currentSource == searchButton)
+		{
+			searchTracks();
+		}
+
+		else if (currentSource == shuffleButton)
+		{
+			shuffleTracks();
+		}
+	}
+
+
+
+	private void shuffleTracks() {
+		MyPlaylist currentPlayList = getPlayList();
+		if (currentPlayList != null) {
+			Track[] currentTracks = currentPlayList.getTrackArray();
+			Track[] shuffled = shuffle(currentTracks);
+			currentPlayList.updateTracks(shuffled);
+			updateList(currentPlayList);
+		}
+
+	}
+
+
+	private Track[] shuffle(Track[] currentTracks) {
+		Track[] shuffled = new Track[currentTracks.length];
+		List<Track> tList = Arrays.asList(currentTracks);
+		Collections.shuffle(tList);
+		tList.toArray(shuffled);
+		return shuffled;
+	}
+
+
+	private void searchTracks() {
+		String title = searchField.getText();
+		if (title.isEmpty() || title.isBlank()) {
+			return;
+		}
+
+		BinaryTrackTree bTree = new BinaryTrackTree();
+		Track tracks[] = myPlaylist.getTrackArray();
+		for (int i=0; i<tracks.length;i++) {
+			bTree.insert(tracks[i]);
+		}
+
+		TreeNode node = bTree.find(bTree.root, title);
+		if (node !=null) {
+			this.currentTrack = node.key;
+			this.playTrack(0);
+		}
+	}
+
+
+	private void loopTrack() {
+		if (isLooping) {
+			isLooping = false;
+		}
+		else {
+			isLooping = true;
+		}
+	}
+
+
+	public void playOrPause()
+	{
+		if (this.playerInstance != null)
+		{
+			if (this.isPausedFlag)
+			{
+				this.resume();
+			}
+			else
+			{
+				this.pauseTrack();
+			}
+		}
+		else
+		{
+			if (this.myPlaylist.getTrackById(0) != null)
+			{
+				this.currentTrack = this.myPlaylist.getById(0);
+				this.playTrack(0);
+			}
+		}
+	}
+
+	private void playTrack()
+	{
+		this.playTrack(this.timeSlider.getValue());
+	}
+
+	private void resume()
+	{
+		playTrack(this.timeSlider.getValue());
+	}
+
+
+	private void pauseTrack()
+	{
+		this.playPauseButton.setIcon(new ImageIcon(PLAY_IMAGE));
+		if (playerInstance != null)
+		{
+			this.playerInstance.close();
+		}
+		this.isPausedFlag = true;
+	}
+
+	public void skipForwardTrack()
+	{
+		if (this.myPlaylist.getLast() != null)
+		{
+			if (this.currentTrack != this.myPlaylist.getLast())
+			{
+				this.currentTrack = this.myPlaylist.getTrackById(this.myPlaylist.getIndexOf(this.currentTrack) + 1);
+				this.playTrack(0);
+			}
+			else
+			{
+				if (isLooping) {
+					Track first = this.myPlaylist.getById(0);
+					this.currentTrack = first;
+					this.playTrack(0);
+				}
+				else {
+					this.pauseTrack();
+					this.timeSlider.setValue(0);
+				}
+			}
+		}
+	}
+
+
+	private void skipBackTrack()
+	{
+		if (this.currentTrack != this.myPlaylist.getTrackById(0) && this.myPlaylist.getCount() > 0)
+		{
+			this.currentTrack = this.myPlaylist.getTrackById(this.myPlaylist.getIndexOf(this.currentTrack) - 1);
+		}
+		this.playTrack(0);
+	}
+
+
+	public void splitCurrentTrackAndWriteToFile(File outputFile, boolean isToSplit)
+	{
+		if (this.currentTrack != null)
+		{
+			try
+			{
+				FileInputStream currentInpStream = new FileInputStream(this.currentTrack.getTrackFile());
+				int point1, point2;
+				if (isToSplit)
+				{
+					point1 = 0;
+					point2 = this.timeSlider.getValue();
+				}
+				else
+				{
+					point1 = this.timeSlider.getValue();
+					point2 = (int) this.totalLength;
+				}
+				currentInpStream.skip((long) point1);
+				FileOutputStream fops = new FileOutputStream(outputFile);
+				int remaining = point2 - point1;
+				byte[] dataBuffer = new byte[remaining];
+				currentInpStream.read(dataBuffer);
+				fops.write(dataBuffer);
+				currentInpStream.close();
+				fops.close();
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+				return;
+			}
+		}
+	}
+
+	public void updateList(MyPlaylist mplaylist)
+	{
+		this.myPlaylist = mplaylist;
+		if (mplaylist.getCount() > 0)
+		{
+			Track firstTrack = mplaylist.getById(0);
+			this.currentTrack = firstTrack;
+		}
+		this.refreshGUI();
+	}
+
+	public void refreshGUI()
+	{
+		try
+		{
+			this.albumLabel.setIcon(new ImageIcon(new ImageIcon(this.currentTrack.getAlbumArt()).getImage().getScaledInstance(70, 70, Image.SCALE_SMOOTH)));
+		}
+		catch (NullPointerException e)
+		{
+			this.albumLabel.setIcon(new ImageIcon(DEFAULT_ALBUM_ART_ICON));
+		}
+
+		if (this.currentTrack != null)
+			this.fieldTrackTitle.setText(this.currentTrack.getTitle() + " - " + this.currentTrack.getArtist());
+	}
+
+
+	public void updateTimerProgress()
+	{
+		int result;
+		try
+		{
+			result = (int) (this.totalLength - this.fileInpstream.available());
+		}
+		catch (IOException e)
+		{
+			return;
+		}
+		this.timeSlider.setValue(result);
+	}
+
+
+	public Track getCurrentTrack()
+	{
+		return this.currentTrack;
+	}
+
+	public void setCurrentTrack(Track track)
+	{
+		this.currentTrack = track;
+		this.pauseTrack();
+		this.timeSlider.setValue(0);
+		try
+		{
+			FileInputStream fips = new FileInputStream(this.currentTrack.getTrackFile());
+			this.timeSlider.setMaximum((int) fips.available());
+			fips.close();
+		}
+		catch (IOException e)
+		{
+			return;
+		}
+	}
+
+
+	public MyPlaylist getPlayList() {
+		return myPlaylist;
+	}
+
+}
+
+
+        
+--------------------
+FILE: C:\Users\Notebook\Desktop\musicbridge\assistente_documentazione_java\repository\mp3-player\src\BackupManager.java
+--------------------
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
+
+public class BackupManager
+{
+	private File currentFile;
+	private String defaultBrowDirectory;
+	private static final String FILE_NAME = "defaults.conf";
+	private String defaultDirectory;
+
+	public BackupManager()
+	{
+		this.currentFile = new File(FILE_NAME);
+		if (this.currentFile.exists())
+		{
+			try
+			{
+				DocumentBuilderFactory docBulderFactory = DocumentBuilderFactory.newInstance();
+				DocumentBuilder builder = docBulderFactory.newDocumentBuilder();
+				Document document = builder.parse(this.currentFile);
+				Node defaultBrNode = document.getElementsByTagName("defaultBrowserDir").item(0);
+				this.defaultBrowDirectory = (defaultBrNode.getTextContent().equals("")) ? null : defaultBrNode.getTextContent();
+				Node defaultDirNode = document.getElementsByTagName("defaultOpenPlaylistDir").item(0);
+				this.defaultDirectory = (defaultDirNode.getTextContent().equals("")) ? null : defaultDirNode.getTextContent();
+			}
+			catch (NullPointerException e)
+			{
+				return;
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void saveDefaultsToFile()
+	{
+		try
+		{
+			DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
+			Document document = documentBuilder.newDocument();
+			Element defElement = document.createElement("Defaults");
+			document.appendChild(defElement);
+			Element defElement1 = document.createElement("defaultBrowserDir");
+			if (this.defaultBrowDirectory != null)
+			{
+				defElement1.appendChild(document.createTextNode(this.defaultBrowDirectory));
+			}
+			defElement.appendChild(defElement1);
+
+			Element defDirEement = document.createElement("defaultOpenPlaylistDir");
+
+			if (this.defaultDirectory != null)
+			{
+				defDirEement.appendChild(document.createTextNode(this.defaultDirectory));
+			}
+			defElement.appendChild(defDirEement);
+			TransformerFactory transFactory = TransformerFactory.newInstance();
+			Transformer transObject = transFactory.newTransformer();
+			transObject.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+			DOMSource domSrc = new DOMSource(document);
+			StringWriter strWriter = new StringWriter();
+			StreamResult strResult = new StreamResult(strWriter);
+			transObject.transform(domSrc, strResult);
+			StringBuffer sbuilder = strWriter.getBuffer();
+			PrintWriter pwriter = new PrintWriter(this.currentFile.getAbsolutePath());
+			pwriter.println(sbuilder.toString());
+			pwriter.close();
+		}
+		catch (ParserConfigurationException | TransformerException | FileNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	public String getDefaultDirectory()
+	{
+		return this.defaultDirectory;
+	}
+
+	public void setDefaultDirectory(String directory)
+	{
+		this.defaultDirectory = directory;
+	}
+
+	public void setDefaultBrowserDir(String path)
+	{
+		this.defaultBrowDirectory = path;
+	}
+
+	public String getDefaultBrowseDirectory()
+	{
+		return this.defaultBrowDirectory;
+	}
+
+}
+
+
+        
+--------------------
+FILE: C:\Users\Notebook\Desktop\musicbridge\assistente_documentazione_java\repository\mp3-player\src\BinaryTrackTree.java
+--------------------
+
+public class BinaryTrackTree {
+	TreeNode root;
+	BinaryTrackTree()
+	{
+		root = null;
+	}
+
+	BinaryTrackTree(Track value) {
+		root = new TreeNode(value);
+	}
+
+	void insert(Track track) {
+		root = insertHelper(root, track);
+	}
+
+	TreeNode insertHelper(TreeNode node, Track key)
+	{
+		if (node == null) {
+			node = new TreeNode(key);
+			return node;
+		}
+
+		if (key.getTitle().compareTo(node.key.getTitle()) < 0)
+			node.left = insertHelper(node.left, key);
+		else if (key.getTitle().compareTo(node.key.getTitle()) > 0)
+			node.right = insertHelper(node.right, key);
+		return node;
+	}
+
+	public TreeNode find(TreeNode node, String title)
+	{
+		if (node == null || node.key.getTitle().equalsIgnoreCase(title))
+			return node;
+
+		if (node.key.getTitle().compareTo(title) < 0)
+			return find(node.right, title);
+
+		return find(node.left,title);
+	}
+}
+
+class TreeNode {
+	Track key;
+	TreeNode left, right;
+
+	public TreeNode(Track t)
+	{
+		key = t;
+		left = right = null;
+	}
+}
+
+
+        
+--------------------
+FILE: C:\Users\Notebook\Desktop\musicbridge\assistente_documentazione_java\repository\mp3-player\src\MusicPlaylistManager.java
+--------------------
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.filechooser.FileSystemView;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+
+public class MusicPlaylistManager extends JFrame implements ActionListener {
+
+    private JPanel albumPanel;
+    private BackupManager backupManager;
+    private MyPlaylist playlistObject;
+    private JTable songTracksTable;
+    private DefaultTableModel trackTableModel;
+
+    private JTextField nameTextField;
+    private JTextField descriptionTextField;
+
+    private JLabel playlistDescLabelValue;
+    private JLabel playlistCountLabelValue;
+    private JLabel playlistDurationLabelValue;
+    private JLabel playlistNameLabelValue;
+
+    private JButton addTrackButton;
+    private JButton removeTrackButton;
+    private JButton createPlayListButton;
+    private JButton openExistingButton;
+    private JButton savePlayListButton;
+    private JButton exitAppButton;
+
+    private AudioPlayer audioPlayer;
+    private JButton sortButton;
+    private JComboBox<String> sortByCombo;
+
+
+    public void populateLeftPanel(JPanel leftPanel) {
+        JPanel newPlaylistPanel = new JPanel();
+        newPlaylistPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Create New",
+                TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+        newPlaylistPanel.setBounds(30, 20, 250, 170);
+        leftPanel.add(newPlaylistPanel);
+        newPlaylistPanel.setLayout(null);
+
+        JLabel playlistNameLbl = new JLabel("Playlist Name");
+        playlistNameLbl.setBounds(10, 18, 100, 14);
+        newPlaylistPanel.add(playlistNameLbl);
+        nameTextField = new JTextField();
+        nameTextField.setBounds(120, 14, 100, 30);
+        newPlaylistPanel.add(nameTextField);
+        nameTextField.setColumns(10);
+        textFieldListener(nameTextField);
+
+
+        JLabel descLabel = new JLabel("Description");
+        descLabel.setBounds(10, 54, 100, 14);
+        newPlaylistPanel.add(descLabel);
+        descriptionTextField = new JTextField();
+        descriptionTextField.setBounds(120, 54, 100, 30);
+        newPlaylistPanel.add(descriptionTextField);
+        descriptionTextField.setColumns(10);
+        textFieldListener(descriptionTextField);
+
+        createPlayListButton = new JButton("Create");
+        createPlayListButton.setBounds(50, 96, 150, 30);
+        createPlayListButton.addActionListener(this);
+        newPlaylistPanel.add(createPlayListButton);
+
+        openExistingButton = new JButton("Open Existing Playlists");
+        openExistingButton.setBounds(20, 200, 200, 30);
+        openExistingButton.addActionListener(this);
+        leftPanel.add(openExistingButton);
+
+        savePlayListButton = new JButton("Save Playlists");
+        savePlayListButton.setBounds(20, 240, 200, 30);
+        savePlayListButton.addActionListener(this);
+        leftPanel.add(savePlayListButton);
+
+        exitAppButton = new JButton("Exit Application");
+        exitAppButton.setBounds(20, 280, 200, 30);
+        exitAppButton.addActionListener(this);
+        leftPanel.add(exitAppButton);
+    }
+
+    public MusicPlaylistManager() {
+        this.playlistObject = new MyPlaylist();
+        this.backupManager = new BackupManager();
+        setTitle("Music Playlist Manager");
+        setResizable(false);
+
+        try {
+            String laf = "com.sun.java.swing.plaf.motif.MotifLookAndFeel";
+            UIManager.setLookAndFeel(UIManager.getLookAndFeel());
+            UIManager.put("Slider.focus", UIManager.get("Slider.background"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        setLocationRelativeTo(null);
+        setBounds(100, 100, 800, 580);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent evt) {
+                closeApp();
+            }
+        });
+
+        JPanel mainPanel = new JPanel();
+        mainPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+        setContentPane(mainPanel);
+        mainPanel.setLayout(null);
+
+        JPanel rightPanel = new JPanel();
+        rightPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Song List",
+                TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+        rightPanel.setBounds(340, 90, 450, 260);
+        mainPanel.add(rightPanel);
+        rightPanel.setLayout(null);
+
+        songTracksTable = new JTable();
+        trackTableModel = new DefaultTableModel(new Object[][] {}, new String[] { "Id ", "Artist", "Title","Duration" }) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        songTracksTable.setModel(trackTableModel);
+        songTracksTable.getColumnModel().getColumn(0).setPreferredWidth(60);
+        songTracksTable.getColumnModel().getColumn(0).setMaxWidth(60);
+        songTracksTable.setColumnSelectionAllowed(false);
+        songTracksTable.setFillsViewportHeight(true);
+        songTracksTable.setRowSelectionAllowed(true);
+
+        JScrollPane scrollPane1 = new JScrollPane(songTracksTable);
+        scrollPane1.setBounds(10, 20, 425, 200);
+        scrollPane1.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane1.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        rightPanel.add(scrollPane1);
+
+        removeTrackButton = new JButton("Remove");
+        removeTrackButton.setBounds(350, 228, 89, 23);
+        removeTrackButton.addActionListener(this);
+        rightPanel.add(removeTrackButton);
+
+        JPanel leftPanel = new JPanel();
+        leftPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Playlists",
+                TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+        leftPanel.setBounds(10, 12, 320, 470);
+        mainPanel.add(leftPanel);
+        leftPanel.setLayout(null);
+
+        addTrackButton = new JButton("Add");
+        addTrackButton.setBounds(240, 228, 89, 23);
+        addTrackButton.addActionListener(this);
+        rightPanel.add(addTrackButton);
+
+        sortButton = new JButton("Sort");
+        sortButton.setBounds(130, 228, 89, 23);
+        sortButton.addActionListener(this);
+        rightPanel.add(sortButton);
+
+        String filters[] = {"Sort by", "artist", "title", "duration"};
+        sortByCombo = new JComboBox<String>(filters);
+        sortByCombo.setBounds(20, 228, 89, 23);
+        rightPanel.add(sortByCombo);
+
+        sortByCombo.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent arg0) {
+                //sortTable();
+            }
+        });
+
+
+        populateLeftPanel(leftPanel);
+
+        JPanel rightTopPanel = new JPanel();
+        rightTopPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Playlist",
+                TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+        rightTopPanel.setBounds(340, 12, 450, 65);
+        mainPanel.add(rightTopPanel);
+        rightTopPanel.setLayout(null);
+
+        JLabel pLabelName = new JLabel("Name : ");
+        pLabelName.setBounds(10, 18, 80, 15);
+        rightTopPanel.add(pLabelName);
+        playlistNameLabelValue = new JLabel();
+        playlistNameLabelValue.setBounds(120, 14, 150, 20);
+        rightTopPanel.add(playlistNameLabelValue);
+
+        JLabel descLabelText = new JLabel("Description : ");
+        descLabelText.setBounds(10, 45, 120, 14);
+        rightTopPanel.add(descLabelText);
+        playlistDescLabelValue = new JLabel();
+        playlistDescLabelValue.setBounds(140, 40, 140, 20);
+        rightTopPanel.add(playlistDescLabelValue);
+
+        JLabel countLabel = new JLabel("Count : ");
+        countLabel.setBounds(280, 16, 80, 14);
+        rightTopPanel.add(countLabel);
+        playlistCountLabelValue = new JLabel();
+        playlistCountLabelValue.setText("0");
+        playlistCountLabelValue.setBounds(340, 12, 75, 20);
+        rightTopPanel.add(playlistCountLabelValue);
+
+        JLabel durLabel = new JLabel("Duration : ");
+        durLabel.setBounds(280, 40, 80, 14);
+        rightTopPanel.add(durLabel);
+        playlistDurationLabelValue = new JLabel();
+        playlistDurationLabelValue.setText("0s");
+        playlistDurationLabelValue.setBounds(360, 36, 75, 20);
+        rightTopPanel.add(playlistDurationLabelValue);
+
+        JPanel panel = new JPanel();
+        panel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Music Player",
+                TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+        panel.setBounds(340, 360, 360, 180);
+        mainPanel.add(panel);
+        panel.setLayout(null);
+
+        albumPanel = new JPanel();
+        albumPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "", TitledBorder.LEADING,
+                TitledBorder.TOP, null, new Color(0, 0, 0)));
+        albumPanel.setBounds(700, 365, 80, 80);
+        mainPanel.add(albumPanel);
+        albumPanel.setLayout(null);
+
+        JLabel artLabel = new JLabel();
+        artLabel.setBounds(4, 4, 70, 70);
+        albumPanel.add(artLabel);
+
+        audioPlayer = new AudioPlayer(this.playlistObject, artLabel);
+        audioPlayer.setBounds(15, 15, 330, 150);
+        panel.add(audioPlayer);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        Object currentSource = e.getSource();
+
+        if (currentSource == addTrackButton) {
+            addTracks();
+        } else if (currentSource == removeTrackButton) {
+            removeTracks();
+        } else if ((currentSource == savePlayListButton) || (currentSource == createPlayListButton)) {
+            savePlayList();
+        } else if (currentSource == exitAppButton) {
+            closeApp();
+        } else if (currentSource == openExistingButton) {
+            openPlayList();
+        }
+        else if (currentSource == sortButton) {
+            sortTable();
+        }
+    }
+
+    private void sortTable() {
+        int rows = trackTableModel.getRowCount();
+        for(int i = rows - 1; i >=0; i--)
+        {
+            trackTableModel.removeRow(i);
+        }
+
+        Track tracks[] = this.playlistObject.getTrackArray();
+        String filter = sortByCombo.getSelectedItem().toString();
+        if (filter.equals("artist")) {
+            QuickSort qs = new QuickSort("artist");
+            qs.sort(tracks, 0, tracks.length-1);
+        }
+        else if (filter.equals("title")) {
+            QuickSort qs = new QuickSort("title");
+            qs.sort(tracks, 0, tracks.length-1);
+        }
+        else if (filter.equals("duration")) {
+            QuickSort qs = new QuickSort("duration");
+            qs.sort(tracks, 0, tracks.length-1);
+        }
+
+        int id = 0;
+        for (Track track : tracks) {
+            trackTableModel.addRow(
+                    new Object[] { id+ 1, track.getArtist(), track.getTitle(), track.getDuration() });
+            id++;
+        }
+
+        MyPlaylist currentPlayList = audioPlayer.getPlayList();
+        if (currentPlayList != null) {
+            currentPlayList.updateTracks(tracks);
+            audioPlayer.updateList(currentPlayList);
+        }
+    }
+
+    public void openPlayList() {
+        JFileChooser jFileChooser = new JFileChooser(new File(
+                ((this.backupManager.getDefaultDirectory() != null) ? this.backupManager.getDefaultDirectory()
+                        : "")));
+        FileNameExtensionFilter feFilter = new FileNameExtensionFilter(null, "wpl");
+        jFileChooser.setFileFilter(feFilter);
+        jFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        if (jFileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            if (jFileChooser.getSelectedFile().getName().endsWith(".wpl")) {
+                this.createPlaylist(jFileChooser.getSelectedFile());
+                this.backupManager.setDefaultDirectory(jFileChooser.getSelectedFile().getParent());
+            }
+        }
+    }
+
+    public void createPlaylist(File playFile) {
+        if (!this.playlistObject.checkSaved()) {
+            int createDialog = JOptionPane.showConfirmDialog(this, "Would you like to save the current playlist?");
+            if (createDialog == JOptionPane.YES_OPTION) {
+                boolean result = this.savePlayList();
+                if (!result) {
+                    return;
+                }
+            }
+            else if (createDialog == JOptionPane.CANCEL_OPTION || createDialog == JOptionPane.CLOSED_OPTION) {
+                return;
+            }
+        }
+
+        if (playFile != null) {
+            try {
+                this.playlistObject = new MyPlaylist(playFile);
+            } catch (FileNotFoundException e) {
+                JOptionPane.showMessageDialog(this, "The selected file does not exist" + "\n" + playFile.getAbsolutePath(), "File Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            this.playlistObject = new MyPlaylist();
+        }
+        this.refresh();
+        this.audioPlayer.updateList(this.playlistObject);
+    }
+
+    public void refresh() {
+        this.nameTextField.setText(this.playlistObject.getName());
+        this.descriptionTextField.setText(this.playlistObject.getDescription());
+        this.playlistCountLabelValue.setText(String.valueOf(this.playlistObject.getCount()));
+        this.playlistDurationLabelValue.setText(this.playlistObject.getDuration());
+        int numRows = this.songTracksTable.getModel().getRowCount();
+        for (int i = 0; i < numRows; i++) {
+            ((DefaultTableModel) this.songTracksTable.getModel()).removeRow(0);
+        }
+
+        int id = 0;
+        for (Track track : this.playlistObject.getTracks()) {
+            trackTableModel.addRow(
+                    new Object[] {  id+ 1, track.getArtist(), track.getTitle(), track.getDuration() });
+            id++;
+        }
+    }
+
+    public void addToList(File selectedFile) {
+
+        if (selectedFile.getName().toLowerCase().endsWith(".mp3")) {
+            try {
+                Track track = new Track(selectedFile.getAbsolutePath());
+                this.playlistObject.add(track);
+                if (this.playlistObject.getCount() == 1) {
+                    this.audioPlayer.setCurrentTrack(track);
+                    this.audioPlayer.refreshGUI();
+                }
+                trackTableModel.addRow(new Object[] { this.playlistObject.getCount(), track.getArtist(), track.getTitle() });
+                refresh();
+            } catch (FileNotFoundException e) {
+                JOptionPane.showMessageDialog(this, "The selected file does not exist" + "\n" + selectedFile.getAbsolutePath(), "File Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Select an MP3 audio file.", "Unsupported File", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    public void addTracks() {
+        JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+        fileChooser.setDialogTitle("Add MP3 files");
+        fileChooser.setFileFilter(new FileNameExtensionFilter("MP3 audio", "mp3"));
+        fileChooser.setMultiSelectionEnabled(true);
+        int result = fileChooser.showOpenDialog(null);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            for (File selectedFile : fileChooser.getSelectedFiles()) {
+                addToList(selectedFile);
+            }
+        }
+    }
+
+
+    public void updateTrackNumbers() {
+        for (int k = 0; k < this.songTracksTable.getModel().getRowCount(); k++) {
+            this.songTracksTable.getModel().setValueAt((k + 1), k, 0);
+        }
+    }
+
+    public void removeTracks() {
+        int numRows = this.songTracksTable.getSelectedRowCount();
+        for (int i = 0; i < numRows; i++) {
+            int id = this.songTracksTable.getSelectedRows()[0];
+            this.playlistObject.remove(id);
+            ((DefaultTableModel) this.songTracksTable.getModel()).removeRow(id);
+        }
+        refresh();
+    }
+
+    public boolean savePlayList() {
+        if (playlistObject.getPlayListFile() == null) {
+            JFileChooser jFileChooser = new JFileChooser();
+            jFileChooser.setSelectedFile(new File(playlistObject.getName() + ".wpl"));
+            if (jFileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+                File sFile = jFileChooser.getSelectedFile();
+                if (sFile.getAbsolutePath().endsWith(MyPlaylist.WPL_STR)) {
+                    if (sFile.exists()) {
+                        int confirmResult = JOptionPane.showConfirmDialog(this,
+                                sFile.getName() + " exists already. Replace?", "Confirmation",
+                                JOptionPane.YES_NO_OPTION);
+                        if (!(confirmResult == JOptionPane.YES_OPTION)) {
+                            return false;
+                        }
+                    }
+                    this.playlistObject.setPlayListFile(jFileChooser.getSelectedFile().getAbsoluteFile());
+                }
+            } else {
+                return false;
+            }
+        }
+        this.playlistObject.savePlayList(MyPlaylist.WPL_STR);
+        JOptionPane.showMessageDialog(this, "Playlist saved.");
+        return true;
+    }
+
+    public void closeApp() {
+        if (!this.playlistObject.checkSaved()) {
+            int closeDialog = JOptionPane.showConfirmDialog(this,
+                    "Do you want to save current playlist?");
+
+            if (closeDialog == JOptionPane.YES_OPTION) {
+                boolean result = this.savePlayList();
+                if (!result) {
+                    return;
+                }
+            }
+            else if (closeDialog == JOptionPane.CANCEL_OPTION || closeDialog == JOptionPane.CLOSED_OPTION) {
+                return;
+            }
+        }
+        this.backupManager.saveDefaultsToFile();
+        System.exit(0);
+    }
+
+    public void textFieldListener(JTextField tf) {
+        DocumentListener listener = new DocumentListener() {
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                onNewPlayList(tf);
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                onNewPlayList(tf);
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                onNewPlayList(tf);
+            }
+        };
+        tf.getDocument().addDocumentListener(listener);
+    }
+
+    private void onNewPlayList(JTextField textField) {
+        if (textField == this.nameTextField) {
+            this.playlistObject.setName(this.nameTextField.getText());
+            playlistNameLabelValue.setText(this.nameTextField.getText());
+        } else if (textField == this.descriptionTextField) {
+            this.playlistObject.setDescription(this.descriptionTextField.getText());
+            playlistDescLabelValue.setText(this.descriptionTextField.getText());
+        }
+    }
+
+    public static void main(String[] args) {
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    MusicPlaylistManager manager = new MusicPlaylistManager();
+                    manager.setVisible(true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+}
+
+
+
+        
+--------------------
+FILE: C:\Users\Notebook\Desktop\musicbridge\assistente_documentazione_java\repository\mp3-player\src\MyHashTable.java
+--------------------
+
+import java.util.ArrayList;
+import java.util.Objects;
+
+public class MyHashTable<K, V> {
+	private int size;
+	private ArrayList<Node<K, V> > buckets;
+	private int bucketCount;
+
+	public MyHashTable()
+	{
+		buckets = new ArrayList<>();
+		bucketCount = 10;
+		size = 0;
+
+		for (int i = 0; i < bucketCount; i++)
+			buckets.add(null);
+	}
+
+	public int size() {
+		return size;
+	}
+
+	public boolean isEmpty() {
+		return size() == 0;
+	}
+
+	private final int getHash (K key) {
+		return Objects.hashCode(key);
+	}
+
+	private int getIndex(K key)
+	{
+		int hash = getHash(key);
+		int id = hash % bucketCount;
+		id = id < 0 ? id * -1 : id;
+		return id;
+	}
+
+	public V remove(K key)
+	{
+		int bucketId = getIndex(key);
+		int hash = getHash(key);
+		Node<K, V> topNode = buckets.get(bucketId);
+		Node<K, V> prevNode = null;
+
+		while (topNode != null) {
+			if (topNode.key.equals(key) && hash == topNode.hash)
+				break;
+
+			prevNode = topNode;
+			topNode = topNode.next;
+		}
+
+		if (topNode == null)
+			return null;
+
+		size--;
+
+		if (prevNode != null)
+			prevNode.next = topNode.next;
+		else
+			buckets.set(bucketId, topNode.next);
+
+		return topNode.value;
+	}
+
+	public V get(K key)
+	{
+		int bucketId = getIndex(key);
+		int hash = getHash(key);
+
+		Node<K, V> topNode = buckets.get(bucketId);
+
+		while (topNode != null) {
+			if (topNode.key.equals(key) && topNode.hash == hash)
+				return topNode.value;
+			topNode = topNode.next;
+		}
+
+		return null;
+	}
+
+	public void add(K key, V value)
+	{
+		int bucketId = getIndex(key);
+		int hash = getHash(key);
+		Node<K, V> topNode = buckets.get(bucketId);
+
+		while (topNode != null) {
+			if (topNode.key.equals(key) && topNode.hash == hash) {
+				topNode.value = value;
+				return;
+			}
+			topNode = topNode.next;
+		}
+
+		size++;
+		topNode = buckets.get(bucketId);
+		Node<K, V> tempNode
+				= new Node<K, V>(key, value, hash);
+		tempNode.next = topNode;
+		buckets.set(bucketId, tempNode);
+
+		if ((1.0 * size) / bucketCount >= 0.7) {
+			ArrayList<Node<K, V> > tempBucket = buckets;
+			buckets = new ArrayList<>();
+			bucketCount = 2 * bucketCount;
+			size = 0;
+			for (int i = 0; i < bucketCount; i++)
+				buckets.add(null);
+
+			for (Node<K, V> headNode : tempBucket) {
+				while (headNode != null) {
+					add(headNode.key, headNode.value);
+					headNode = headNode.next;
+				}
+			}
+		}
+	}
+}
+
+class Node<K, V> {
+	K key;
+	V value;
+	final int hash;
+	Node<K, V> next;
+
+	public Node(K key, V value, int hash)
+	{
+		this.key = key;
+		this.value = value;
+		this.hash = hash;
+	}
+}
+
+
+        
+--------------------
+FILE: C:\Users\Notebook\Desktop\musicbridge\assistente_documentazione_java\repository\mp3-player\src\MyPlaylist.java
+--------------------
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.*;
+import java.nio.file.Files;
+import java.util.ArrayDeque;
+import java.util.Queue;
+
+
+public class MyPlaylist
+{
+	private String description;
+	private String name;
+	private File playlistFile;
+	//private ArrayList<Track> tracks;
+	private Queue<Track> tracks ;
+
+	private static final String WPL_PREFIX = "<?wpl version=\"1.0\"?>";
+	public static final String AUDIO_M3U = "m3u";
+	public static final String WPL_STR = "wpl";
+
+
+	public MyPlaylist()
+	{
+		this.description = new String();
+		this.name = new String();
+		this.tracks = new ArrayDeque<Track>();
+	}
+
+	public MyPlaylist(File pFile) throws FileNotFoundException
+	{
+		this.playlistFile = pFile;
+		this.tracks = new ArrayDeque<Track>();
+		if (pFile.getName().endsWith(".wpl"))
+		{
+			try
+			{
+				DocumentBuilderFactory dBuildFactory = DocumentBuilderFactory.newInstance();
+				DocumentBuilder dBuilder = dBuildFactory.newDocumentBuilder();
+				Document document = dBuilder.parse(pFile);
+				Node titleItem = document.getElementsByTagName("title").item(0);
+				this.name = titleItem.getTextContent();
+				Node descItem = document.getElementsByTagName("author").item(0);
+				this.description = descItem.getTextContent();
+				NodeList mediaItem = document.getElementsByTagName("media");
+
+				for (int i = 0; i < mediaItem.getLength(); i++)
+				{
+					Track track = new Track(mediaItem.item(i).getAttributes().getNamedItem("src").getTextContent());
+
+					this.tracks.add(track);
+				}
+			}
+			catch (FileNotFoundException e)
+			{
+				throw new FileNotFoundException();
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		else
+		{
+			System.out.println("File format not supported.");
+		}
+	}
+
+	public void savePlayList(String file)
+	{
+		String result = "";
+		switch(file)
+		{
+			case WPL_STR:
+			{
+				result = this.wplParser();
+				break;
+			}
+			case AUDIO_M3U:
+			{
+				break;
+			}
+			default:
+			{
+				System.out.println("File format not supported: " + file);
+				return;
+			}
+		}
+
+		try
+		{
+			PrintWriter writer = new PrintWriter(this.getPlayListFile().getAbsolutePath());
+			writer.println(result);
+			writer.close();
+		}
+		catch (FileNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	public String wplParser()
+	{
+		String result = WPL_PREFIX;
+		try
+		{
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+			Document document = docBuilder.newDocument();
+
+			Element smilEle = document.createElement("smil");
+			document.appendChild(smilEle);
+			Element headEle = document.createElement("head");
+			smilEle.appendChild(headEle);
+			Element titleEle = document.createElement("title");
+			titleEle.appendChild(document.createTextNode(this.getName()));
+			headEle.appendChild(titleEle);
+			Element authorEle = document.createElement("author");
+			authorEle.appendChild(document.createTextNode(this.getDescription()));
+			headEle.appendChild(authorEle);
+			Element bodyEle = document.createElement("body");
+			smilEle.appendChild(bodyEle);
+			Element seqEle = document.createElement("seq");
+			bodyEle.appendChild(seqEle);
+
+			for (Track track : this.tracks)
+			{
+				Element mediaElement = document.createElement("media");
+				mediaElement.setAttribute("src", track.getTrackFile().getAbsolutePath());
+				mediaElement.setAttribute("albumTitle", track.getAlbum());
+				mediaElement.setAttribute("albumArtist", track.getArtist());
+				mediaElement.setAttribute("trackTitle", track.getTitle());
+				mediaElement.setAttribute("trackArtist", track.getArtist());
+				mediaElement.setAttribute("duration", Long.toString(track.getDuration()));
+				seqEle.appendChild(mediaElement);
+			}
+
+			TransformerFactory transFactory = TransformerFactory.newInstance();
+			Transformer transformerObj = transFactory.newTransformer();
+			transformerObj.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+			DOMSource domSrc = new DOMSource(document);
+			StringWriter strWriter = new StringWriter();
+			StreamResult strResult = new StreamResult(strWriter);
+			transformerObj.transform(domSrc, strResult);
+			StringBuffer sbuilder = strWriter.getBuffer();
+			result += sbuilder.toString();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	public boolean checkSaved()
+	{
+		if (this.playlistFile == null && this.description.equals("") && this.name.equals("") && this.tracks.size() == 0)
+			return true;
+
+		if (this.playlistFile == null)
+			return false;
+		String wplOutput = this.wplParser();
+		String fileResult = new String();
+		try
+		{
+			fileResult = Files.readAllLines(this.playlistFile.toPath()).get(0);
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+
+		if (wplOutput.equals(fileResult))
+		{
+			return true;
+		}
+		return false;
+	}
+
+	public String getName()
+	{
+		return this.name;
+	}
+
+
+	public String getDescription()
+	{
+		return this.description;
+	}
+
+
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+
+
+	public void setDescription(String description)
+	{
+		this.description = description;
+	}
+
+	public Queue<Track> getTracks()
+	{
+		return this.tracks;
+	}
+
+
+
+	public int getIndexOf(Track track)
+	{
+		Queue<Track> queueCopy = new ArrayDeque<Track>(tracks);
+		for(int i=0; i < tracks.size(); i++){
+			Track c = queueCopy.remove();
+			if (c.equals(track)) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+
+	public Track getTrackById(int id)
+	{
+		if (id <= (this.tracks.size() - 1) && id >= 0)
+		{
+			return getById(id);
+		}
+		return null;
+	}
+
+
+	public Track getById(int index) {
+		Queue<Track> queueCopy = new ArrayDeque<Track>(tracks);
+		for(int i=0; i<index; i++){
+			queueCopy.remove();
+		}
+		return queueCopy.peek();
+	}
+
+	public Track getLast()
+	{
+		if (this.tracks.size() != 0)
+		{
+			return getById(this.tracks.size() - 1);
+		}
+		return null;
+	}
+
+	public File getPlayListFile()
+	{
+		return this.playlistFile;
+	}
+
+	public void setPlayListFile(File file)
+	{
+		this.playlistFile = file;
+	}
+
+	public int getCount()
+	{
+		return this.tracks.size();
+	}
+
+	public String getDuration()
+	{
+		long duration = 0;
+
+		for (Track track : this.tracks)
+		{
+			duration += track.getDuration();
+		}
+
+		int hrs = (int) duration / 3600;
+		int rem = (int) duration - hrs * 3600;
+		int min = rem / 60;
+		rem = rem - min * 60;
+		int sec = rem;
+
+		return (((hrs == 0) ? "" : hrs + "h ") + ((hrs == 0 && min == 0) ? "" : min + "m ") + sec + "s");
+	}
+
+
+	public void add(Track track)
+	{
+		this.tracks.add(track);
+	}
+
+	public void remove(int id)
+	{
+
+		this.tracks.remove(getById(id));
+	}
+
+	public Track[] getTrackArray() {
+		Queue<Track> queueCopy = new ArrayDeque<Track>(tracks);
+		Track array[] = new Track[tracks.size()];
+		for(int i=0; i < tracks.size(); i++){
+			array[i] = queueCopy.remove();
+		}
+		return array;
+	}
+
+	public void updateTracks(Track[] ts) {
+		Queue<Track> queueCopy = new ArrayDeque<Track>();;
+		for (Track t : ts) {
+			queueCopy.add(t);
+		}
+		tracks = queueCopy;
+	}
+
+	/*public void swap(int index1, int index2)
+	{
+		Collections.swap(this.tracks, index1, index2);
+	}*/
+
+}
+
+
+        
+--------------------
+FILE: C:\Users\Notebook\Desktop\musicbridge\assistente_documentazione_java\repository\mp3-player\src\MySet.java
+--------------------
+
+import java.util.*;
+
+public class MySet extends AbstractSet {
+    private HashMap<Object, Object> mapObject = null;
+    private static final Object temp = new Object();
+
+    public MySet() {
+        mapObject = new HashMap<>();
+    }
+
+    public boolean add(Object object) {
+        return mapObject.put(object, temp)==null;
+    }
+
+    @Override
+    public Iterator iterator() {
+        return mapObject.keySet().iterator();
+    }
+
+    @Override
+    public int size() {
+        return mapObject.size();
+    }
+
+}
+
+
+        
+--------------------
+FILE: C:\Users\Notebook\Desktop\musicbridge\assistente_documentazione_java\repository\mp3-player\src\QuickSort.java
+--------------------
+
+public class QuickSort
+{
+	String category;
+	public QuickSort(String c) {
+		this.category = c;
+	}
+
+	int compareByArtist(Track t1, Track t2) {
+		return t1.getArtist().compareTo(t2.getArtist());
+	}
+
+	int compareByTitle(Track t1, Track t2) {
+		return t1.getTitle().compareTo(t2.getTitle());
+	}
+
+	int compareByDuration(Track o1, Track o2) {
+		if (o2.getDuration() < o1.getDuration()) {
+			return 1;
+		}
+		else if(o2.getDuration() > o1.getDuration()) {
+			return -1;
+		}
+		else {
+			return 0;
+		}
+	}
+
+	int compare(Track t1, Track t2) {
+		if (category.equals("artist")) {
+			return compareByArtist(t1, t2);
+		}
+		else if (category.equals("title")) {
+			return compareByTitle(t1, t2);
+		}
+		else {
+			return compareByDuration(t1, t2);
+		}
+
+	}
+
+	// Partition of data into two separate arrays allows for
+	// quicksort to work.
+	private int partition(Track array[], int start, int end)
+	{
+		Track pivotElement = array[end];
+		int i = (start-1);
+		for (int j=start; j<end; j++)
+		{
+			if (compare(array[j],pivotElement) <=0)
+			{
+				i++;
+				Track temp = array[i];
+				array[i] = array[j];
+				array[j] = temp;
+			}
+		}
+
+		Track temp = array[i+1];
+		array[i+1] = array[end];
+		array[end] = temp;
+		return i+1;
+	}
+
+
+	public void sort(Track array[], int start, int end)
+	{
+		if (start < end)
+		{
+			int pi = partition(array, start, end);
+			sort(array, start, pi-1);
+			sort(array, pi+1, end);
+		}
+	}
+}
+
+
+        
+--------------------
+FILE: C:\Users\Notebook\Desktop\musicbridge\assistente_documentazione_java\repository\mp3-player\src\Track.java
+--------------------
+
+import com.mpatric.mp3agic.ID3v2;
+import com.mpatric.mp3agic.Mp3File;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+
+public class Track
+{
+	private BufferedImage albumImage;
+	private File trackFile;
+	private String titleStr;
+	private String artistStr;
+	private String albumStr;
+	private long duration;
+
+
+	public Track(String path) throws FileNotFoundException
+	{
+		this.trackFile = new File(path);
+		try
+		{
+			Mp3File track = new Mp3File(this.getTrackFile().getAbsolutePath());
+			if (track.hasId3v2Tag())
+			{
+				ID3v2 id3v2Obj = track.getId3v2Tag();
+				this.titleStr = id3v2Obj.getTitle();
+				this.artistStr = id3v2Obj.getArtist();
+				this.albumStr = id3v2Obj.getAlbum();
+				this.duration = track.getLengthInSeconds();
+				byte[] imgData = id3v2Obj.getAlbumImage();
+				if (imgData != null)
+				{
+					this.albumImage = ImageIO.read(new ByteArrayInputStream(imgData));
+				}
+			}
+		}
+		catch (FileNotFoundException e)
+		{
+			throw new FileNotFoundException();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		this.titleStr = (this.titleStr == null) ? (this.trackFile.getName().substring(0, this.trackFile.getName().length() - 4)) : this.titleStr;
+		this.artistStr = (this.artistStr == null) ? "unknown artist" : this.artistStr;
+		this.albumStr = (this.albumStr == null) ? "unknown album" : this.albumStr;
+	}
+
+	public String getArtist()
+	{
+		return this.artistStr;
+	}
+
+	public String getTitle()
+	{
+		return this.titleStr;
+	}
+
+
+	public long getDuration()
+	{
+		return this.duration;
+	}
+
+
+	public BufferedImage getAlbumArt()
+	{
+		return this.albumImage;
+	}
+
+	public String getAlbum()
+	{
+		return this.albumStr;
+	}
+
+	public File getTrackFile()
+	{
+		return this.trackFile;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((albumStr == null) ? 0 : albumStr.hashCode());
+		result = prime * result + ((artistStr == null) ? 0 : artistStr.hashCode());
+		result = prime * result + (int) (duration ^ (duration >>> 32));
+		result = prime * result + ((titleStr == null) ? 0 : titleStr.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Track other = (Track) obj;
+		if (albumStr == null) {
+			if (other.albumStr != null)
+				return false;
+		} else if (!albumStr.equals(other.albumStr))
+			return false;
+		if (artistStr == null) {
+			if (other.artistStr != null)
+				return false;
+		} else if (!artistStr.equals(other.artistStr))
+			return false;
+		if (duration != other.duration)
+			return false;
+		if (titleStr == null) {
+			if (other.titleStr != null)
+				return false;
+		} else if (!titleStr.equals(other.titleStr))
+			return false;
+		return true;
+	}
+
+
+}
+
+
+        
+--------------------
+FILE: C:\Users\Notebook\Desktop\musicbridge\assistente_documentazione_java\repository\mp3-player\src\test\java\DataStructureSmokeTest.java
+--------------------
+
+public final class DataStructureSmokeTest {
+    private DataStructureSmokeTest() {
+    }
+
+    public static void main(String[] args) {
+        MyHashTable<String, Integer> table = new MyHashTable<>();
+        table.add("first", 1);
+        table.add("second", 2);
+        table.add("first", 3);
+
+        assert table.size() == 2 : "Updating a key must not increase table size.";
+        assert table.get("first") == 3 : "Updated value was not returned.";
+        assert table.remove("second") == 2 : "Removed value was not returned.";
+        assert table.get("second") == null : "Removed key is still present.";
+
+        MySet set = new MySet();
+        assert set.add("track") : "First insertion should change the set.";
+        assert !set.add("track") : "Duplicate insertion should not change the set.";
+        assert set.size() == 1 : "Set should contain one unique value.";
+
+        System.out.println("All data-structure smoke tests passed.");
+    }
+}
+
+

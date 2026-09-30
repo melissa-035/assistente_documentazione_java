@@ -1,0 +1,12 @@
+{
+    "task": "javadoc",
+    "date": "2026-08-07 11:31:52",
+    "LLM_runtime_seconds": 543.2424738407135,
+    "repository": "mp3-player",
+    "model": "gemma3_4b",
+    "prompt_type": "zero_shot",
+    "prompt_file": "C:\\Users\\Notebook\\Desktop\\musicbridge\\assistente_documentazione_java/prompts/javadoc_prompts/zero_shot.txt",
+    "prompt_length": 53359,
+    "response_length": 5896,
+    "files_analyzed": 10
+}

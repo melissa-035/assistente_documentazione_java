@@ -1,0 +1,15 @@
+{
+    "task": "readme",
+    "date": "2026-09-30 16:31:54",
+    "LLM_runtime_seconds": 289.30285477638245,
+    "repository": "mp3-player",
+    "model": "gemma3_4b",
+    "prompt_type": "chain_of_thought",
+    "prompt_file": "prompts\\readme_prompts\\chain_of_thought.txt",
+    "prompt_length": 4470,
+    "response_length": 5668,
+    "files_analyzed": 10,
+    "classes": 10,
+    "methods": 77,
+    "fields": 52
+}

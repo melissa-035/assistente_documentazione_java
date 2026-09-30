@@ -1,0 +1,15 @@
+{
+    "task": "readme",
+    "date": "2026-09-30 16:00:02",
+    "LLM_runtime_seconds": 429.7247667312622,
+    "repository": "mp3-player",
+    "model": "gemma3_4b",
+    "prompt_type": "few_shot",
+    "prompt_file": "prompts\\readme_prompts\\few_shot.txt",
+    "prompt_length": 4584,
+    "response_length": 6479,
+    "files_analyzed": 10,
+    "classes": 10,
+    "methods": 77,
+    "fields": 52
+}
