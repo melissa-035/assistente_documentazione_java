@@ -1,0 +1,15 @@
+{
+    "task": "readme",
+    "date": "2026-10-08 13:14:44",
+    "LLM_runtime_seconds": 266.5634186267853,
+    "repository": "Music-Explorer",
+    "model": "gemma3_4b",
+    "prompt_type": "zero_shot",
+    "prompt_file": "prompts\\readme_prompts\\zero_shot.txt",
+    "prompt_length": 8476,
+    "response_length": 5694,
+    "files_analyzed": 19,
+    "classes": 19,
+    "methods": 159,
+    "fields": 5
+}

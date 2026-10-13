@@ -1,0 +1,30 @@
+You are a software developer, your job is to comment the given java class with javadoc style comments:
+
+        
+--------------------
+FILE: src\main\java\pl\mgodyn\asciiart\application\validator\rules\FileExistenceValidationRule.java
+--------------------
+
+package pl.mgodyn.asciiart.application.validator.rules;
+
+import pl.mgodyn.asciiart.application.validator.ValidationRule;
+
+import java.io.File;
+
+public class FileExistenceValidationRule implements ValidationRule {
+
+    private final String ERROR_MESSAGE = "File does not exist!";
+
+    @Override
+    public boolean isValid(String[] args) {
+        File file = new File(args[0]);
+        return file.exists();
+    }
+
+    @Override
+    public String getErrorMessage() {
+        return ERROR_MESSAGE;
+    }
+}
+
+

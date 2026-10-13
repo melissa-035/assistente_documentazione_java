@@ -1,0 +1,73 @@
+Generate javadoc style comments for the following java class.
+Below is an example of a commented method.
+
+Example:
+
+INPUT:
+        public static <T> Enumeration<T> enumeration(final Collection<T> c) {
+            return new Enumeration<T>() {
+                private final Iterator<T> i = c.iterator();
+
+                public boolean hasMoreElements() {
+                    return i.hasNext();
+                }
+
+                public T nextElement() {
+                    return i.next();
+                }
+            };
+        }
+
+OUTPUT:
+/**
+        * Returns an enumeration over the specified collection.  This provides
+        * interoperability with legacy APIs that require an enumeration
+        * as input.
+        *
+        * @param c the collection for which an enumeration is to be returned.
+        * @return an enumeration over the specified collection.
+        * @see Enumeration
+        */
+       public static <T> Enumeration<T> enumeration(final Collection<T> c) {
+           return new Enumeration<T>() {
+               private final Iterator<T> i = c.iterator();
+
+               public boolean hasMoreElements() {
+                   return i.hasNext();
+               }
+
+               public T nextElement() {
+                   return i.next();
+               }
+           };
+       }
+---
+Now generate javadoc comments for the following class:
+
+
+        
+--------------------
+FILE: app\src\main\java\com\envisionate\musicinfolders\BluetoothReceiver.java
+--------------------
+
+package com.envisionate.musicinfolders;
+
+import static com.envisionate.musicinfolders.Globals.properties;
+import static com.envisionate.musicinfolders.Globals.theMusicExplorer;
+
+import android.bluetooth.BluetoothDevice;
+import android.content.Context;
+import android.content.Intent;
+
+public class BluetoothReceiver extends BroadcastReceiver {
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        if ( BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(intent.getAction()) ) {
+            if ( properties.getExitOnBTDisconnect() )
+                Util.broadcast(theMusicExplorer,"com.envisionate.musicinfolders.STOP_AND_EXIT");
+        }
+    }
+}
+
+

@@ -1,0 +1,15 @@
+{
+    "task": "readme",
+    "date": "2026-10-12 15:31:25",
+    "LLM_runtime_seconds": 32.50888657569885,
+    "repository": "ascii-art",
+    "model": "north-mini-code",
+    "prompt_type": "chain_of_thought",
+    "prompt_file": "prompts\\readme_prompts\\chain_of_thought.txt",
+    "prompt_length": 2740,
+    "response_length": 11672,
+    "files_analyzed": 13,
+    "classes": 13,
+    "methods": 14,
+    "fields": 1
+}

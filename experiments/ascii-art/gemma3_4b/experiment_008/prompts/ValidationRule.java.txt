@@ -1,0 +1,16 @@
+Generate javadoc type comments for the following code:
+        
+--------------------
+FILE: src\main\java\pl\mgodyn\asciiart\application\validator\ValidationRule.java
+--------------------
+
+package pl.mgodyn.asciiart.application.validator;
+
+public interface ValidationRule {
+
+    boolean isValid(String[] args);
+
+    String getErrorMessage();
+}
+
+

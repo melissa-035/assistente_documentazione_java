@@ -1,0 +1,439 @@
+You are a software developer, your job is to comment the given java class with javadoc style comments:
+
+        
+--------------------
+FILE: app\src\main\java\com\envisionate\musicinfolders\MusicExplorer.java
+--------------------
+
+package com.envisionate.musicinfolders;
+
+import static com.envisionate.musicinfolders.Globals.properties;
+import static com.envisionate.musicinfolders.Globals.theDatabase;
+import static com.envisionate.musicinfolders.Globals.theMusicExplorer;
+import static com.envisionate.musicinfolders.Globals.theMusicExplorerInterface;
+import static com.envisionate.musicinfolders.Globals.theMusicPlayer;
+import static com.envisionate.musicinfolders.Globals.theSQLiteDatabase;
+import static com.envisionate.musicinfolders.Globals.theUtilities;
+import static com.envisionate.musicinfolders.Globals.trackLaunchedActivities;
+
+import android.bluetooth.BluetoothDevice;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.res.Configuration;
+import android.graphics.Rect;
+import android.net.Uri;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.view.WindowManager;
+import android.view.WindowMetrics;
+import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
+import android.widget.GridView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.documentfile.provider.DocumentFile;
+import androidx.media3.common.MediaMetadata;
+import androidx.media3.common.Player;
+
+import com.envisionate.musicinfolders.database.DBSchema;
+import com.envisionate.musicinfolders.database.Database;
+import com.envisionate.musicinfolders.database.DBSchema.dbHelper;
+
+import com.envisionate.musicinfolders.interfaces.IMusicExplorer;
+
+import java.util.ArrayList;
+
+public class MusicExplorer extends AppCompatActivity implements Player.Listener {
+
+    public abstract class ItemViewAdapter extends ArrayAdapter<itemModel> {
+
+        private int itemTextViewId = 0;
+        private int itemImageViewId = 0;
+        private int itemLayoutId = 0;
+
+        public ItemViewAdapter(Context context, ArrayList<itemModel> list,int textViewId,int imageViewId,int layoutId) {
+            super(context, 0, list);
+            itemTextViewId = textViewId;
+            itemImageViewId = imageViewId;
+            itemLayoutId = layoutId;
+        }
+
+        abstract String cleanName(String theFileName);
+
+        @Override
+        public View getView(int position,View convertView,ViewGroup parent) {
+
+            View itemView = convertView;
+            if ( null == itemView )
+                itemView = LayoutInflater.from(getContext()).inflate(itemLayoutId, parent, false);
+
+            itemModel model = getItem(position);
+
+            model.setImageView(itemView.findViewById(itemImageViewId));
+            model.setTextView(itemView.findViewById(itemTextViewId));
+
+            TextView textView = itemView.findViewById(itemTextViewId);
+
+            textView.setText(cleanName(model.getName()));
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    theMusicExplorerInterface.onItemClicked(((itemModel)v.getTag()).getURi(),null,false);
+                }
+            });
+
+            itemView.setTag(model);
+
+            return itemView;
+        }
+
+    }
+
+    public class FolderViewAdapter extends ItemViewAdapter {
+        public FolderViewAdapter(Context context, ArrayList<itemModel> list) {
+            super(context,  list,R.id.folder_text_view,R.id.folder_image_view,R.layout.folder);
+        }
+
+        @Override
+        String cleanName(String theFileName) {
+            return theFileName;
+        }
+    }
+
+    public class TrackViewAdapter extends ItemViewAdapter {
+        public TrackViewAdapter(Context context, ArrayList<itemModel> list) {
+            super(context, list,R.id.file_text_view,R.id.file_image_view,R.layout.track);
+        }
+
+        @Override
+        String cleanName(String fileName) {
+            String s = fileName;
+            if ( -1 < s.lastIndexOf('.') )
+                s = s.substring(0,s.lastIndexOf('.'));
+            return s;
+        }
+    }
+
+    private View homeView = null;
+    private GridView foldersGridView = null;
+    private GridView tracksGridView = null;
+    private FrameLayout filesFrameLayout = null;
+
+    private ArrayList<itemModel> theFolderItems = new ArrayList<itemModel>();
+    private ArrayList<itemModel> theTrackItems = new ArrayList<itemModel>();
+
+    private static int homeViewHeight = 0;
+    private static int foldersContainerViewWidth = 0;
+    private static int foldersContainerViewHeight = 0;
+    private static int tracksContainerViewWidth = 0;
+    private static int tracksContainerViewHeight = 0;
+    private static Boolean layoutNotified = false;
+    private Boolean wasStartedByCar = false;
+    private Boolean wasResumedPlay = false;
+
+    private BluetoothReceiver bluetoothReceiver = new BluetoothReceiver();
+
+    private ActionBar actionBar = null;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+
+        super.onCreate(savedInstanceState);
+
+        theMusicExplorer = this;
+        theMusicExplorerInterface = new IMusicExplorer();
+
+        if ( null == properties )
+            properties = new Properties(getPreferences(MODE_PRIVATE));
+
+        if ( null == theDatabase ) {
+            theDatabase = new Database(getApplicationContext());
+            theSQLiteDatabase = theDatabase.open();
+        }
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        setContentView(R.layout.musicexplorer);
+
+        actionBar = getSupportActionBar();
+
+        homeView = findViewById(R.id.musicexplorer_main);
+        foldersGridView = findViewById(R.id.folders_view_grid);
+        filesFrameLayout = findViewById(R.id.files_view_frame);
+        tracksGridView = findViewById(R.id.files_view_grid);
+
+        if ( properties.getExitOnBTDisconnect() ) {
+            registerReceiver(bluetoothReceiver, new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED));
+            registerReceiver(bluetoothReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
+        }
+
+        if ( properties.getResumePlayOnStart() ) {
+            if ( ! ( null == properties.getCurrentFile() ) ) {
+                theMusicExplorerInterface.playCurrentTrack(this,false);
+                wasResumedPlay = true;
+                return;
+            }
+        }
+
+        if ( ! ( null == getIntent().getStringExtra("StartedByCar") ) ) {
+            Util.broadcast(this,"com.envisionate.musicinfolders.STARTED_NOTIFY");
+            getIntent().removeExtra("StartedByCar");
+            wasStartedByCar = true;
+        }
+
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if ( ! "Play".equals(trackLaunchedActivities.getLastLaunchedActivity()) )
+            displayFoldersAndFiles(properties.getCurrentFolder());
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    protected void onResume() {
+        super.onResume();
+        if ( ! wasResumedPlay )
+            displayFoldersAndFiles(properties.getCurrentFolder());
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if ( ! ( null == theMusicPlayer ) )
+            theMusicPlayer.finish();
+        super.onDestroy();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.common, menu);
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if ( R.id.action_settings == item.getItemId() ) {
+            startActivity(new Intent(this, Settings.class));
+            return true;
+        }
+        if ( item.getItemId() == android.R.id.home ) {
+            theMusicExplorerInterface.gotoParent();
+            return true;
+        }
+        if ( R.id.exit == item.getItemId() ) {
+            Util.broadcast(this,"com.envisionate.musicinfolders.STOP_REQUESTED");
+            return true;
+        }
+        return false;
+    }
+
+    public Boolean getWasStartedByAuto() {
+        return wasStartedByCar;
+    }
+
+    public void setWasStartedByAuto(Boolean v) {
+        wasStartedByCar = v;
+    }
+
+    public void clearResumedPlay() {
+        wasResumedPlay = false;
+    }
+
+    public void displayFoldersAndFiles(DocumentFile innerPath) {
+
+        filesAndFolders theEntities = theUtilities.getCurrentFilesAndFolders(innerPath);
+
+        if ( null == theEntities ) {
+            properties.resetPreferences();
+            startActivity(new Intent(this, Settings.class));
+            return;
+        }
+
+        FolderViewAdapter foldersViewAdapter = (FolderViewAdapter)foldersGridView.getAdapter();
+        if ( ! ( null == foldersViewAdapter ) ) {
+            foldersViewAdapter.clear();
+            foldersViewAdapter.notifyDataSetChanged();
+        }
+
+        theFolderItems.clear();
+
+        TrackViewAdapter tracksViewAdapter = (TrackViewAdapter)tracksGridView.getAdapter();
+        if ( ! ( null == tracksViewAdapter ) ) {
+            tracksViewAdapter.clear();
+            tracksViewAdapter.notifyDataSetChanged();
+        }
+
+        theTrackItems.clear();
+
+        int k = 0;
+        for ( String folderName : theEntities.getFolderNames() )
+            theFolderItems.add(new itemModel(folderName, theEntities.getFolderURis().get(k++)));
+
+        k = 0;
+        for ( String fileName : theEntities.getFileNames() )
+            theTrackItems.add(new itemModel(fileName,theEntities.getFileURis().get(k++)));
+
+        actionBar.setDisplayHomeAsUpEnabled(null == innerPath || uriToName(innerPath.getUri()).equals(properties.getRootFolderName()) ? false : true);
+
+        if ( null == foldersViewAdapter ) {
+            foldersViewAdapter = new FolderViewAdapter(this,theFolderItems);
+            foldersGridView.setAdapter(foldersViewAdapter);
+        }
+
+        foldersViewAdapter.notifyDataSetChanged();
+
+        if ( null == tracksViewAdapter ) {
+            tracksViewAdapter = new TrackViewAdapter(this,theTrackItems);
+            tracksGridView.setAdapter(tracksViewAdapter);
+        }
+
+        tracksViewAdapter.notifyDataSetChanged();
+
+        layoutNotified = false;
+
+        if ( theMusicExplorerInterface.isRoot() )
+            this.setTitle(this.getString(R.string.app_name));
+        else
+            this.setTitle(properties.getCurrentFolder().getName().toString());
+
+        ((TextView)findViewById(R.id.no_files_view)).setVisibility(0 == theEntities.size() ? View.VISIBLE : View.INVISIBLE);
+
+        homeView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                homeView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                layoutFoldersAndFiles();
+            }
+        });
+
+    }
+
+    public void layoutFoldersAndFiles() {
+
+        WindowMetrics windowMetrics = this.getSystemService(WindowManager.class).getCurrentWindowMetrics();
+        Rect bounds = windowMetrics.getBounds();
+
+        foldersContainerViewWidth = bounds.width();
+        homeViewHeight = bounds.height();
+
+        int columnCount = foldersContainerViewWidth / properties.getFolderViewWidth();
+
+        int rowCount = Math.max(1, theFolderItems.size() / columnCount);
+        if ( rowCount * columnCount < theFolderItems.size() )
+            rowCount += 1;
+
+        if ( theFolderItems.isEmpty() )
+            foldersContainerViewHeight = 0;
+        else {
+            if ( 0 < theTrackItems.size() )
+                foldersContainerViewHeight = Math.min(rowCount * properties.getFolderViewHeight(),2 * homeViewHeight / 3);
+            else
+                foldersContainerViewHeight = homeViewHeight;
+        }
+
+        foldersGridView.setNumColumns(columnCount);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(foldersContainerViewWidth, foldersContainerViewHeight);
+        foldersGridView.setLayoutParams(params);
+
+        layoutFiles();
+
+        if ( ! layoutNotified )
+            Util.broadcast(this,"com.envisionate.musicinfolders.NAVIGATION_NOTIFY");
+
+        layoutNotified = true;
+
+    }
+
+    private void layoutFiles() {
+
+        tracksContainerViewWidth = foldersContainerViewWidth;
+        tracksContainerViewHeight = homeViewHeight - foldersContainerViewHeight;
+
+        int columnCount = tracksContainerViewWidth / properties.getFileViewWidth();
+
+        tracksGridView.setNumColumns(columnCount);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(tracksContainerViewWidth, tracksContainerViewHeight);
+        params.topMargin = foldersContainerViewHeight;
+        filesFrameLayout.setLayoutParams(params);
+
+    }
+
+    public filesAndFolders getDisplayedFilesAndFolder() {
+
+        if ( theFolderItems.isEmpty() && theTrackItems.isEmpty() )
+            return null;
+
+        ArrayList<String> folders = new ArrayList<String>();
+        ArrayList<String> folderURis = new ArrayList<String>();
+        ArrayList<String> files = new ArrayList<String>();
+        ArrayList<String> fileURis = new ArrayList<String>();
+
+        for ( itemModel im : theFolderItems ) {
+            folders.add(im.getName());
+            folderURis.add(im.getURi());
+        }
+
+        for ( itemModel im : theTrackItems ) {
+            files.add(im.getName());
+            fileURis.add(im.getURi());
+        }
+
+        return new filesAndFolders(folders,files,folderURis,fileURis);
+    }
+
+    public String uriToName(Uri theUri) {
+        if ( null == theUri )
+            return null;
+        String [] pathNames = theUri.getPath().split(":");
+        if ( 0 < pathNames.length )
+            return pathNames[pathNames.length - 1];
+        return null;
+    }
+
+    public DocumentFile getParentOf(DocumentFile aFolder,Boolean isNavigation) {
+        if ( null == aFolder )
+            return null;
+        String parentUri = dbHelper.sqlQueryString("SELECT parentUri FROM folders WHERE folderUri = ?",new String [] {aFolder.getUri().toString()} );
+        if ( null == parentUri )
+            return null;
+        return DocumentFile.fromTreeUri(this,Uri.parse(parentUri));
+    }
+
+    // Player.Listener methods:
+
+    @Override
+    public void onMediaMetadataChanged(MediaMetadata md) {
+    }
+
+    @Override
+    public void onEvents(Player player, Player.Events events) {
+    }
+
+
+}
+
+

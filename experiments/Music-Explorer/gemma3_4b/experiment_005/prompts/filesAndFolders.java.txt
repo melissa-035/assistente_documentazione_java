@@ -1,0 +1,93 @@
+You are a software developer, your job is to comment the given java class with javadoc style comments:
+
+        
+--------------------
+FILE: app\src\main\java\com\envisionate\musicinfolders\filesAndFolders.java
+--------------------
+
+package com.envisionate.musicinfolders;
+
+import androidx.documentfile.provider.DocumentFile;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.TreeMap;
+
+public class filesAndFolders {
+
+    private ArrayList<String> theFolderNames;
+    private ArrayList<String> theFolderURis;
+    private TreeMap<String,String> folderNameToUri = new TreeMap<String,String>();
+
+    private ArrayList<String> theFileNames;
+    private ArrayList<String> theFileURis;
+    private TreeMap<String,String> fileNameToUri = new TreeMap<String,String>();
+
+    public filesAndFolders(ArrayList<String> folders,ArrayList<String> files,ArrayList<String> folderURis,ArrayList<String> fileURis) {
+        theFolderNames = folders;
+        theFileNames = files;
+        theFolderURis = folderURis;
+        theFileURis = fileURis;
+    }
+
+    public void sort() {
+
+        theFolderNames.sort(new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                return o1.compareToIgnoreCase(o2);
+            }
+        });
+
+        theFolderURis.clear();
+
+        for ( String name : theFolderNames )
+            theFolderURis.add(folderNameToUri.get(name));
+
+        theFileNames.sort(new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                return o1.compareToIgnoreCase(o2);
+            }
+        });
+
+        theFileURis.clear();
+
+        for ( String name : theFileNames )
+            theFileURis.add(fileNameToUri.get(name));
+    }
+
+    public int size() {
+        return theFolderNames.size() + theFileNames.size();
+    }
+
+    public void addEntity(DocumentFile df) {
+        if ( df.isDirectory() ) {
+            theFolderNames.add(df.getName());
+            theFolderURis.add(df.getUri().toString());
+            folderNameToUri.put(df.getName(),df.getUri().toString());
+        } else {
+            theFileNames.add(df.getName());
+            theFileURis.add(df.getUri().toString());
+            fileNameToUri.put(df.getName(),df.getUri().toString());
+        }
+    }
+
+    public ArrayList<String> getFolderNames() {
+        return theFolderNames;
+    }
+
+    public ArrayList<String> getFolderURis() {
+    return theFolderURis;
+    }
+
+    public ArrayList<String> getFileNames() {
+        return theFileNames;
+    }
+
+    public ArrayList<String> getFileURis() {
+        return theFileURis;
+    }
+
+}
+

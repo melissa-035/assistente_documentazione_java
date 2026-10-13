@@ -1,0 +1,98 @@
+Generate javadoc style comments for the following java class.
+Below is an example of a commented method.
+
+Example:
+
+INPUT:
+        public static <T> Enumeration<T> enumeration(final Collection<T> c) {
+            return new Enumeration<T>() {
+                private final Iterator<T> i = c.iterator();
+
+                public boolean hasMoreElements() {
+                    return i.hasNext();
+                }
+
+                public T nextElement() {
+                    return i.next();
+                }
+            };
+        }
+
+OUTPUT:
+/**
+        * Returns an enumeration over the specified collection.  This provides
+        * interoperability with legacy APIs that require an enumeration
+        * as input.
+        *
+        * @param c the collection for which an enumeration is to be returned.
+        * @return an enumeration over the specified collection.
+        * @see Enumeration
+        */
+       public static <T> Enumeration<T> enumeration(final Collection<T> c) {
+           return new Enumeration<T>() {
+               private final Iterator<T> i = c.iterator();
+
+               public boolean hasMoreElements() {
+                   return i.hasNext();
+               }
+
+               public T nextElement() {
+                   return i.next();
+               }
+           };
+       }
+---
+Now generate javadoc comments for the following class:
+
+
+        
+--------------------
+FILE: app\src\main\java\com\envisionate\musicinfolders\itemModel.java
+--------------------
+
+package com.envisionate.musicinfolders;
+
+import android.view.View;
+
+public class itemModel {
+
+    private String name;
+    private String documentFileUri = null;
+    private View itemImageView = null;
+    private View itemTextView = null;
+
+    public itemModel(String name,String fileUri) {
+        this.name = name;
+        itemImageView = null;
+        itemTextView = null;
+        documentFileUri = fileUri;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getURi() { return documentFileUri; }
+
+    public void setImageView(View view) {
+        this.itemImageView = view;
+    }
+
+    public View getImageView() {
+        return itemImageView;
+    }
+
+    public void setTextView(View view) {
+        this.itemTextView = view;
+    }
+
+    public View getTextView() {
+        return itemTextView;
+    }
+
+}
+

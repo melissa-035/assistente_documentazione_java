@@ -1,0 +1,53 @@
+You are a software developer, your job is to comment the given java class with javadoc style comments:
+
+        
+--------------------
+FILE: app\src\main\java\com\envisionate\musicinfolders\itemModel.java
+--------------------
+
+package com.envisionate.musicinfolders;
+
+import android.view.View;
+
+public class itemModel {
+
+    private String name;
+    private String documentFileUri = null;
+    private View itemImageView = null;
+    private View itemTextView = null;
+
+    public itemModel(String name,String fileUri) {
+        this.name = name;
+        itemImageView = null;
+        itemTextView = null;
+        documentFileUri = fileUri;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getURi() { return documentFileUri; }
+
+    public void setImageView(View view) {
+        this.itemImageView = view;
+    }
+
+    public View getImageView() {
+        return itemImageView;
+    }
+
+    public void setTextView(View view) {
+        this.itemTextView = view;
+    }
+
+    public View getTextView() {
+        return itemTextView;
+    }
+
+}
+

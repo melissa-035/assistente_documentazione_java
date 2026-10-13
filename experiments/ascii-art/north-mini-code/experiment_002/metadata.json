@@ -1,0 +1,15 @@
+{
+    "task": "readme",
+    "date": "2026-10-12 15:30:09",
+    "LLM_runtime_seconds": 37.57918977737427,
+    "repository": "ascii-art",
+    "model": "north-mini-code",
+    "prompt_type": "few_shot",
+    "prompt_file": "prompts\\readme_prompts\\few_shot.txt",
+    "prompt_length": 2854,
+    "response_length": 4068,
+    "files_analyzed": 13,
+    "classes": 13,
+    "methods": 14,
+    "fields": 1
+}

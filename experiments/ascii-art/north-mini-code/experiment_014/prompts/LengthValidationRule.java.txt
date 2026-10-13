@@ -1,0 +1,31 @@
+Generate javadoc style comments for the following code.
+
+First analyze the code of the class.
+Analyze what each method does, what parameters it takes in, and what output it produces.
+Then write a structured comment in the javadoc syntax.
+
+        
+--------------------
+FILE: src\main\java\pl\mgodyn\asciiart\application\validator\rules\LengthValidationRule.java
+--------------------
+
+package pl.mgodyn.asciiart.application.validator.rules;
+
+import pl.mgodyn.asciiart.application.validator.ValidationRule;
+
+public class LengthValidationRule implements ValidationRule {
+
+    private final String ERROR_MESSAGE = "Too many or no arguments!";
+
+    @Override
+    public boolean isValid(String[] args) {
+        return args.length == 1;
+    }
+
+    @Override
+    public String getErrorMessage() {
+        return ERROR_MESSAGE;
+    }
+}
+
+

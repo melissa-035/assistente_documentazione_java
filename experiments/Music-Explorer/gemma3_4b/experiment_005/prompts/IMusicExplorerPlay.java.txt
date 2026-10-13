@@ -1,0 +1,18 @@
+You are a software developer, your job is to comment the given java class with javadoc style comments:
+
+        
+--------------------
+FILE: app\src\main\java\com\envisionate\musicinfolders\interfaces\IMusicExplorerPlay.java
+--------------------
+
+package com.envisionate.musicinfolders.interfaces;
+
+public interface IMusicExplorerPlay {
+
+    public void onPlayTrackMSChanged(long trackMS);
+
+    public void playShuttingDown();
+
+}
+
+

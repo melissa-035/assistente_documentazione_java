@@ -1,0 +1,21 @@
+Generate javadoc style comments for the following code.
+
+First analyze the code of the class.
+Analyze what each method does, what parameters it takes in, and what output it produces.
+Then write a structured comment in the javadoc syntax.
+
+        
+--------------------
+FILE: src\main\java\pl\mgodyn\asciiart\utils\ScreenSizeProvider.java
+--------------------
+
+package pl.mgodyn.asciiart.utils;
+
+import java.awt.Dimension;
+
+public interface ScreenSizeProvider {
+
+    Dimension getScreenSize();
+}
+
+

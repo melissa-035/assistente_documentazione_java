@@ -1,0 +1,51 @@
+Generate javadoc style comments for the following code.
+
+First analyze the code of the class.
+Analyze what each method does, what parameters it takes in, and what output it produces.
+Then write a structured comment in the javadoc syntax.
+
+        
+--------------------
+FILE: app\src\main\java\com\envisionate\carservice\screen\MessageScreen.java
+--------------------
+
+package com.envisionate.carservice.screen;
+
+import androidx.car.app.CarContext;
+import androidx.car.app.Screen;
+import androidx.car.app.model.CarText;
+import androidx.car.app.model.Header;
+import androidx.car.app.model.MessageTemplate;
+import androidx.car.app.model.Template;
+
+import com.envisionate.musicinfolders.Util;
+
+import org.jspecify.annotations.NonNull;
+
+public class MessageScreen extends Screen {
+
+    private String theMessage = null;
+    private Runnable onGetTemplateRunnable = null;
+    private static MessageScreen currentMessageScreen = null;
+
+    public MessageScreen(@NonNull CarContext carContext,int theMessageId,Runnable run) {
+        super(carContext);
+        this.theMessage = carContext.getString(theMessageId);
+        onGetTemplateRunnable = run;
+        currentMessageScreen = this;
+    }
+
+    @Override
+    public @NonNull Template onGetTemplate() {
+        if ( ! ( null == onGetTemplateRunnable ) )
+            onGetTemplateRunnable.run();
+        CarText theMessage = new CarText.Builder(this.theMessage).build();
+        return new MessageTemplate.Builder(theMessage).setHeader(new Header.Builder().setTitle(new CarText.Builder("Note").build()).build()).build();
+    }
+
+    public static MessageScreen getCurrentMessageScreen() {
+        return currentMessageScreen;
+    }
+}
+
+

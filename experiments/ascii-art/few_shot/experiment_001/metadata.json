@@ -1,0 +1,15 @@
+{
+    "task": "readme",
+    "date": "2026-10-07 12:39:38",
+    "LLM_runtime_seconds": 178.897038936615,
+    "repository": "ascii-art",
+    "model": "few_shot",
+    "prompt_type": "role_prompting",
+    "prompt_file": "prompts\\readme_prompts\\role_prompting.txt",
+    "prompt_length": 3392,
+    "response_length": 3095,
+    "files_analyzed": 18,
+    "classes": 18,
+    "methods": 14,
+    "fields": 1
+}

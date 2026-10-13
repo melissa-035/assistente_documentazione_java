@@ -1,0 +1,17 @@
+You are a software developer, your job is to comment the given java class with javadoc style comments:
+
+        
+--------------------
+FILE: src\main\java\pl\mgodyn\asciiart\utils\ScreenSizeProvider.java
+--------------------
+
+package pl.mgodyn.asciiart.utils;
+
+import java.awt.Dimension;
+
+public interface ScreenSizeProvider {
+
+    Dimension getScreenSize();
+}
+
+

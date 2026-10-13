@@ -1,0 +1,75 @@
+Generate javadoc style comments for the following java class.
+Below is an example of a commented method.
+
+Example:
+
+INPUT:
+        public static <T> Enumeration<T> enumeration(final Collection<T> c) {
+            return new Enumeration<T>() {
+                private final Iterator<T> i = c.iterator();
+
+                public boolean hasMoreElements() {
+                    return i.hasNext();
+                }
+
+                public T nextElement() {
+                    return i.next();
+                }
+            };
+        }
+
+OUTPUT:
+/**
+        * Returns an enumeration over the specified collection.  This provides
+        * interoperability with legacy APIs that require an enumeration
+        * as input.
+        *
+        * @param c the collection for which an enumeration is to be returned.
+        * @return an enumeration over the specified collection.
+        * @see Enumeration
+        */
+       public static <T> Enumeration<T> enumeration(final Collection<T> c) {
+           return new Enumeration<T>() {
+               private final Iterator<T> i = c.iterator();
+
+               public boolean hasMoreElements() {
+                   return i.hasNext();
+               }
+
+               public T nextElement() {
+                   return i.next();
+               }
+           };
+       }
+---
+Now generate javadoc comments for the following class:
+
+
+        
+--------------------
+FILE: src\main\java\pl\mgodyn\asciiart\application\validator\rules\FileExistenceValidationRule.java
+--------------------
+
+package pl.mgodyn.asciiart.application.validator.rules;
+
+import pl.mgodyn.asciiart.application.validator.ValidationRule;
+
+import java.io.File;
+
+public class FileExistenceValidationRule implements ValidationRule {
+
+    private final String ERROR_MESSAGE = "File does not exist!";
+
+    @Override
+    public boolean isValid(String[] args) {
+        File file = new File(args[0]);
+        return file.exists();
+    }
+
+    @Override
+    public String getErrorMessage() {
+        return ERROR_MESSAGE;
+    }
+}
+
+

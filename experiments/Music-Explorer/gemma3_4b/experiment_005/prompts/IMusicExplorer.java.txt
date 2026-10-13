@@ -1,0 +1,111 @@
+You are a software developer, your job is to comment the given java class with javadoc style comments:
+
+        
+--------------------
+FILE: app\src\main\java\com\envisionate\musicinfolders\interfaces\IMusicExplorer.java
+--------------------
+
+package com.envisionate.musicinfolders.interfaces;
+
+import static android.os.Looper.getMainLooper;
+import static com.envisionate.musicinfolders.Globals.currentPlayerListener;
+import static com.envisionate.musicinfolders.Globals.properties;
+import static com.envisionate.musicinfolders.Globals.theMusicExplorer;
+import static com.envisionate.musicinfolders.Globals.theMusicPlayer;
+import static com.envisionate.musicinfolders.Globals.trackLaunchedActivities;
+
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Handler;
+
+import androidx.car.app.CarToast;
+import androidx.documentfile.provider.DocumentFile;
+import androidx.media3.common.Player;
+
+import com.envisionate.carservice.CarService;
+import com.envisionate.musicinfolders.Play;
+import com.envisionate.musicinfolders.Util;
+
+public class IMusicExplorer {
+
+     public void onItemClicked(String thePathURi,Player.Listener theListener,Boolean fromAuto) {
+        DocumentFile thePath = DocumentFile.fromTreeUri(theMusicExplorer.getApplicationContext(),Uri.parse(thePathURi));
+        if ( thePath.isDirectory() ) {
+            if ( ! ( null == CarService.getCarSession() ) )
+                CarToast.makeText(CarService.getCarContext(),"Navigating",CarToast.LENGTH_SHORT).show();
+            theMusicExplorer.displayFoldersAndFiles(thePath);
+            return;
+        }
+        properties.setCurrentFile(thePath);
+        playCurrentTrack(theListener,fromAuto);
+    }
+
+    public void gotoParent() {
+        if ( ! ( null == CarService.getCarSession() ) )
+            CarToast.makeText(CarService.getCarContext(),"Navigating",CarToast.LENGTH_SHORT).show();
+        if ( "Play".equals(trackLaunchedActivities.getLastLaunchedActivity()) )  {
+            theMusicPlayer.stop();
+            theMusicExplorer.displayFoldersAndFiles(properties.getCurrentFolder());
+        } else {
+            DocumentFile df = theMusicExplorer.getParentOf(properties.getCurrentFolder(),true);
+            theMusicExplorer.displayFoldersAndFiles(df);
+        }
+        properties.setCurrentFile((DocumentFile)null);
+    }
+
+    public void previous() {
+        theMusicPlayer.previous();
+    }
+
+    public void pause() {
+        theMusicPlayer.pause();
+    }
+
+    public void play() {
+        theMusicPlayer.play();
+    }
+
+    public void next() {
+        theMusicPlayer.next();
+    }
+
+    public void stopPlay() {
+        theMusicPlayer.stop();
+    }
+
+    public void playCurrentTrack(Player.Listener theListener,Boolean fromAuto) {
+        currentPlayerListener = theListener;
+        Intent startPlayer = new Intent(theMusicExplorer,Play.class);
+        startPlayer.putExtra("ClickIsFromAuto",fromAuto ? "true" : "false");
+        theMusicExplorer.startActivity(startPlayer);
+    }
+
+    public Boolean isRoot() {
+        if ( null == properties.getCurrentFolder() )
+            return true;
+        if ( null == theMusicExplorer.getParentOf(properties.getCurrentFolder(),false) )
+            return true;
+        return false;
+    }
+
+    public Boolean hasRoot() {
+        return ! ( null == properties.getRootFolder() ) && ! "<click Browse>".equals(properties.getRootFolder());
+    }
+
+    public void setCurrentTrack(String theTrackUri) {
+        DocumentFile theTrack = DocumentFile.fromTreeUri(theMusicExplorer.getApplicationContext(),Uri.parse(theTrackUri));
+        properties.setCurrentFile(theTrack);
+    }
+
+    public Player.Listener getCurrentPlayerListener() {
+        return currentPlayerListener;
+    }
+
+    public Bitmap getFolderImage(String folderName) {
+        return Util.getFolderImage(theMusicExplorer,folderName);
+    }
+
+}
+
+

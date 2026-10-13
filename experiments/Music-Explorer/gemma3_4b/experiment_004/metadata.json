@@ -1,0 +1,15 @@
+{
+    "task": "readme",
+    "date": "2026-10-08 14:30:23",
+    "LLM_runtime_seconds": 580.883385181427,
+    "repository": "Music-Explorer",
+    "model": "gemma3_4b",
+    "prompt_type": "chain_of_thought",
+    "prompt_file": "prompts\\readme_prompts\\chain_of_thought.txt",
+    "prompt_length": 8664,
+    "response_length": 7528,
+    "files_analyzed": 19,
+    "classes": 19,
+    "methods": 159,
+    "fields": 5
+}

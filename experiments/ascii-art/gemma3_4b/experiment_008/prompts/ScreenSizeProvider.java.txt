@@ -1,0 +1,16 @@
+Generate javadoc type comments for the following code:
+        
+--------------------
+FILE: src\main\java\pl\mgodyn\asciiart\utils\ScreenSizeProvider.java
+--------------------
+
+package pl.mgodyn.asciiart.utils;
+
+import java.awt.Dimension;
+
+public interface ScreenSizeProvider {
+
+    Dimension getScreenSize();
+}
+
+

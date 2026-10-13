@@ -1,0 +1,15 @@
+{
+    "task": "readme",
+    "date": "2026-10-07 13:07:55",
+    "LLM_runtime_seconds": 165.4433889389038,
+    "repository": "ascii-art",
+    "model": "gemma3_4b",
+    "prompt_type": "zero_shot",
+    "prompt_file": "prompts\\readme_prompts\\zero_shot.txt",
+    "prompt_length": 3319,
+    "response_length": 3109,
+    "files_analyzed": 18,
+    "classes": 18,
+    "methods": 14,
+    "fields": 1
+}

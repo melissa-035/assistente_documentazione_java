@@ -1,0 +1,17 @@
+You are a software developer, your job is to comment the given java class with javadoc style comments:
+
+        
+--------------------
+FILE: src\main\java\pl\mgodyn\asciiart\application\validator\ValidationRule.java
+--------------------
+
+package pl.mgodyn.asciiart.application.validator;
+
+public interface ValidationRule {
+
+    boolean isValid(String[] args);
+
+    String getErrorMessage();
+}
+
+

@@ -1,0 +1,413 @@
+You are a software developer, your job is to write a README.md for the given project, the structure of the project is provided below:
+
+
+--------------------
+FILE: app\src\main\java\com\envisionate\carservice\CarService.java
+--------------------
+
+Class:
+CarService
+
+Fields:
+
+
+Methods:
+- onDestroy(@NonNull LifecycleOwner owner)
+- onCreateScreen(Intent theIntent)
+- run()
+- onCreateSession(SessionInfo sessionInfo)
+
+
+--------------------
+FILE: app\src\main\java\com\envisionate\carservice\screen\CarEntitiesScreen.java
+--------------------
+
+Class:
+CarEntitiesScreen
+
+Fields:
+
+
+Methods:
+- onGetTemplate()
+- handleOnBackPressed()
+- run()
+- handleOnBackPressed()
+
+
+--------------------
+FILE: app\src\main\java\com\envisionate\carservice\screen\CarPlayerScreen.java
+--------------------
+
+Class:
+CarPlayerScreen
+
+Fields:
+
+
+Methods:
+- onClick()
+- onClick()
+- onClick()
+- handleOnBackPressed()
+- onPlayTrackMSChanged(long newTrackMS)
+- playShuttingDown()
+- allowInvalidate()
+- onIsPlayingChanged(boolean playerIsPlaying)
+- onMediaMetadataChanged(MediaMetadata md)
+- run()
+- onEvents(Player player, Player.Events events)
+- run()
+
+
+--------------------
+FILE: app\src\main\java\com\envisionate\carservice\screen\MessageScreen.java
+--------------------
+
+Class:
+MessageScreen
+
+Fields:
+
+
+Methods:
+
+
+--------------------
+FILE: app\src\main\java\com\envisionate\musicinfolders\BluetoothReceiver.java
+--------------------
+
+Class:
+BluetoothReceiver
+
+Fields:
+
+
+Methods:
+- onReceive(Context context, Intent intent)
+
+
+--------------------
+FILE: app\src\main\java\com\envisionate\musicinfolders\BroadcastReceiver.java
+--------------------
+
+Class:
+BroadcastReceiver
+
+Fields:
+
+
+Methods:
+- onReceive(Context context, Intent intent)
+- run()
+- run()
+- run()
+- run()
+- run()
+
+
+--------------------
+FILE: app\src\main\java\com\envisionate\musicinfolders\filesAndFolders.java
+--------------------
+
+Class:
+filesAndFolders
+
+Fields:
+- theFolderNames: ArrayList<String>
+- theFolderURis: ArrayList<String>
+- theFileNames: ArrayList<String>
+- theFileURis: ArrayList<String>
+
+
+Methods:
+- sort()
+- compare(String o1, String o2)
+- compare(String o1, String o2)
+- size()
+- addEntity(DocumentFile df)
+- getFolderNames()
+- getFolderURis()
+- getFileNames()
+- getFileURis()
+
+
+--------------------
+FILE: app\src\main\java\com\envisionate\musicinfolders\Globals.java
+--------------------
+
+Class:
+Globals
+
+Fields:
+
+
+Methods:
+
+
+--------------------
+FILE: app\src\main\java\com\envisionate\musicinfolders\itemModel.java
+--------------------
+
+Class:
+itemModel
+
+Fields:
+- name: String
+
+
+Methods:
+- getName()
+- setName(String name)
+- getURi()
+- setImageView(View view)
+- getImageView()
+- setTextView(View view)
+- getTextView()
+
+
+--------------------
+FILE: app\src\main\java\com\envisionate\musicinfolders\MusicExplorer.java
+--------------------
+
+Class:
+MusicExplorer
+
+Fields:
+
+
+Methods:
+- getView(int position,View convertView,ViewGroup parent)
+- onClick(View v)
+- onConfigurationChanged(Configuration newConfig)
+- onCreateOptionsMenu(Menu menu)
+- onOptionsItemSelected(MenuItem item)
+- getWasStartedByAuto()
+- setWasStartedByAuto(Boolean v)
+- clearResumedPlay()
+- displayFoldersAndFiles(DocumentFile innerPath)
+- onGlobalLayout()
+- layoutFoldersAndFiles()
+- getDisplayedFilesAndFolder()
+- uriToName(Uri theUri)
+- getParentOf(DocumentFile aFolder,Boolean isNavigation)
+- onMediaMetadataChanged(MediaMetadata md)
+- onEvents(Player player, Player.Events events)
+
+
+--------------------
+FILE: app\src\main\java\com\envisionate\musicinfolders\Play.java
+--------------------
+
+Class:
+Play
+
+Fields:
+
+
+Methods:
+- run()
+- onCreateOptionsMenu(Menu menu)
+- onOptionsItemSelected(MenuItem item)
+- pause()
+- previous()
+- play()
+- next()
+- stop()
+- getPlayer()
+- addListener(Player.Listener obj)
+- addListener(IMusicExplorerPlay obj)
+- getTrackDuration()
+- onIsPlayingChanged(boolean isPlaying)
+- onMediaMetadataChanged(MediaMetadata md)
+- onEvents(Player player, Player.Events events)
+- onMediaItemTransition(MediaItem mediaItem, @Player.MediaItemTransitionReason int reason)
+
+
+--------------------
+FILE: app\src\main\java\com\envisionate\musicinfolders\Properties.java
+--------------------
+
+Class:
+Properties
+
+Fields:
+
+
+Methods:
+- resetPreferences()
+- savePreferences()
+- setIsInitialSetup(Boolean v)
+- getIsInitialSetup()
+- setRootFolder(Uri uri)
+- getRootFolder()
+- getRootFolderName()
+- getAutoDisplayColumns()
+- setAutoDisplayColumns(int v)
+- getAutoDisplayFolders()
+- setAutoDisplayFolders(Boolean v)
+- setFolderViewWidth(int v)
+- getFolderViewWidth()
+- setFolderViewHeight(int v)
+- getFolderViewHeight()
+- setFileViewWidth(int v)
+- getFileViewWidth()
+- setCurrentFolder(DocumentFile theFolder)
+- getCurrentFolder()
+- setCurrentFile(String s)
+- setCurrentFile(DocumentFile theFile)
+- getCurrentFile()
+- setLastPlayedFile(DocumentFile theFile)
+- setExitOnBTDisconnect(Boolean v)
+- getExitOnBTDisconnect()
+- setBtPermissionsRequestCount(int v)
+- getBtPermissionsRequestCount()
+- setResumePlayOnStart(Boolean v)
+- getResumePlayOnStart()
+- setCurrentTrackMS(long v)
+- getCurrentTrackMS()
+
+
+--------------------
+FILE: app\src\main\java\com\envisionate\musicinfolders\Settings.java
+--------------------
+
+Class:
+Settings
+
+Fields:
+
+
+Methods:
+- onClick(View v)
+- onClick(View v)
+- onClick(View v)
+- onClick(View v)
+- onClick(View v)
+- onClick(View v)
+- onClick(DialogInterface dialog, int which)
+- onClick(DialogInterface dialog, int which)
+- onOptionsItemSelected(MenuItem item)
+- onRequestPermissionsResult(int wtf , String[] wtf2, int[] wtf3)
+
+
+--------------------
+FILE: app\src\main\java\com\envisionate\musicinfolders\TrackLaunchedActivities.java
+--------------------
+
+Class:
+TrackLaunchedActivities
+
+Fields:
+
+
+Methods:
+- onCreate()
+- getLastLaunchedActivity()
+- onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState)
+- onActivityDestroyed(@NonNull Activity activity)
+- onActivityPaused(@NonNull Activity activity)
+- onActivityResumed(@NonNull Activity activity)
+- onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState)
+- onActivityStarted(@NonNull Activity activity)
+- onActivityStopped(@NonNull Activity activity)
+
+
+--------------------
+FILE: app\src\main\java\com\envisionate\musicinfolders\Util.java
+--------------------
+
+Class:
+Util
+
+Fields:
+
+
+Methods:
+- getCurrentFilesAndFolders(DocumentFile overrideCurrent)
+- run()
+
+
+--------------------
+FILE: app\src\main\java\com\envisionate\musicinfolders\database\Database.java
+--------------------
+
+Class:
+Database
+
+Fields:
+
+
+Methods:
+- open()
+- create()
+- hasFoldersAndFiles(Uri folderUri)
+- getFoldersAndFiles(Uri folderUri, ArrayList<String> folderNames,ArrayList<String> folderURis,ArrayList<String> fileNames,ArrayList<String> fileURis)
+- compare(String o1, String o2)
+- compare(String o1, String o2)
+- addFolder(DocumentFile parentFolder,DocumentFile thisFolder, filesAndFolders fAndF, Boolean doReplace,Boolean retainParentUri)
+- addFolder(DocumentFile parentFolder,DocumentFile thisFolder, ArrayList<String> folderNames,
+                            ArrayList<String> folderURis,ArrayList<String> fileNames,ArrayList<String> fileURis,Boolean doReplace,Boolean retainParentUri)
+- compare(String o1, String o2)
+
+
+--------------------
+FILE: app\src\main\java\com\envisionate\musicinfolders\database\DBSchema.java
+--------------------
+
+Class:
+DBSchema
+
+Fields:
+
+
+Methods:
+- sqlCommand(String sql,Object [] parameters)
+- insertOne(String tableName,String [] columnNames,String [] values)
+- insertMultiple(String tableName,String [] columnNames,String [][] values)
+- fetchMultiple(String tableName,String [] columnNames,String sqlClause,ArrayList<String> [] results)
+- sqlQueryInt(String sql,String [] parameters)
+- onCreate(SQLiteDatabase db)
+- onOpen(SQLiteDatabase db)
+- onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
+- onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion)
+
+
+--------------------
+FILE: app\src\main\java\com\envisionate\musicinfolders\interfaces\IMusicExplorer.java
+--------------------
+
+Class:
+IMusicExplorer
+
+Fields:
+
+
+Methods:
+- onItemClicked(String thePathURi,Player.Listener theListener,Boolean fromAuto)
+- gotoParent()
+- previous()
+- pause()
+- play()
+- next()
+- stopPlay()
+- playCurrentTrack(Player.Listener theListener,Boolean fromAuto)
+- isRoot()
+- hasRoot()
+- setCurrentTrack(String theTrackUri)
+- getFolderImage(String folderName)
+
+
+--------------------
+FILE: app\src\main\java\com\envisionate\musicinfolders\interfaces\IMusicExplorerPlay.java
+--------------------
+
+Class:
+None
+
+Fields:
+
+
+Methods:
+- onPlayTrackMSChanged(long trackMS)
+- playShuttingDown()

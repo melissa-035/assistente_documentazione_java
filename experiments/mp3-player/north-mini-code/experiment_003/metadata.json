@@ -1,0 +1,15 @@
+{
+    "task": "readme",
+    "date": "2026-10-12 14:55:16",
+    "LLM_runtime_seconds": 23.19855761528015,
+    "repository": "mp3-player",
+    "model": "north-mini-code",
+    "prompt_type": "zero_shot",
+    "prompt_file": "prompts\\readme_prompts\\zero_shot.txt",
+    "prompt_length": 4282,
+    "response_length": 4436,
+    "files_analyzed": 10,
+    "classes": 10,
+    "methods": 77,
+    "fields": 52
+}

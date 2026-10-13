@@ -1,0 +1,34 @@
+```java
+package com.envisionate.musicinfolders;
+
+import android.database.sqlite.SQLiteDatabase;
+
+import androidx.car.app.annotations.ExperimentalCarApi;
+import androidx.media3.common.Player;
+
+import com.envisionate.musicinfolders.database.Database;
+import com.envisionate.musicinfolders.interfaces.IMusicExplorer;
+import com.envisionate.musicinfolders.util.Util;
+
+@ExperimentalCarApi
+public final class Globals {
+
+    public static TrackLaunchedActivities trackLaunchedActivities = null;
+
+    public static MusicExplorer theMusicExplorer = null;
+    public static IMusicExplorer theMusicExplorerInterface = null;
+    public static Play theMusicPlayer = null;
+
+    public static Player.Listener currentPlayerListener = null;
+
+    public static Properties properties = null;
+
+    public static final int FOLDER_NOMINAL_VIEW_WIDTH = 256;
+    public static final int FOLDER_NOMINAL_VIEW_HEIGHT = 256;
+    public static final int TRACK_NOMINAL_VIEW_WIDTH = 256;
+
+    public static Util theUtilities = new Util();
+    public static Database theDatabase = null;
+    public static SQLiteDatabase theSQLiteDatabase = null;
+}
+```

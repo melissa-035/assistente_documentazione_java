@@ -1,0 +1,15 @@
+{
+    "task": "readme",
+    "date": "2026-10-08 12:44:19",
+    "LLM_runtime_seconds": 387.92671513557434,
+    "repository": "Music-Explorer",
+    "model": "gemma3_4b",
+    "prompt_type": "role_prompting",
+    "prompt_file": "prompts\\readme_prompts\\role_prompting.txt",
+    "prompt_length": 8549,
+    "response_length": 4387,
+    "files_analyzed": 19,
+    "classes": 19,
+    "methods": 159,
+    "fields": 5
+}

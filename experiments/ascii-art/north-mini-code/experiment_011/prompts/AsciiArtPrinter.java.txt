@@ -1,0 +1,77 @@
+Generate javadoc style comments for the following java class.
+Below is an example of a commented method.
+
+Example:
+
+INPUT:
+        public static <T> Enumeration<T> enumeration(final Collection<T> c) {
+            return new Enumeration<T>() {
+                private final Iterator<T> i = c.iterator();
+
+                public boolean hasMoreElements() {
+                    return i.hasNext();
+                }
+
+                public T nextElement() {
+                    return i.next();
+                }
+            };
+        }
+
+OUTPUT:
+/**
+        * Returns an enumeration over the specified collection.  This provides
+        * interoperability with legacy APIs that require an enumeration
+        * as input.
+        *
+        * @param c the collection for which an enumeration is to be returned.
+        * @return an enumeration over the specified collection.
+        * @see Enumeration
+        */
+       public static <T> Enumeration<T> enumeration(final Collection<T> c) {
+           return new Enumeration<T>() {
+               private final Iterator<T> i = c.iterator();
+
+               public boolean hasMoreElements() {
+                   return i.hasNext();
+               }
+
+               public T nextElement() {
+                   return i.next();
+               }
+           };
+       }
+---
+Now generate javadoc comments for the following class:
+
+
+        
+--------------------
+FILE: src\main\java\pl\mgodyn\asciiart\io\AsciiArtPrinter.java
+--------------------
+
+package pl.mgodyn.asciiart.io;
+
+public class AsciiArtPrinter {
+
+    private final StringBuilder stringBuilder = new StringBuilder();
+
+    public void add2Row(char ascii) {
+        var toAppend = String.valueOf(ascii).repeat(3);
+        stringBuilder.append(toAppend);
+    }
+
+    public void createNewRow() {
+        stringBuilder.append("\n");
+    }
+
+    public void print() {
+        System.out.println(stringBuilder);
+    }
+
+    public String getCurrentBuffer() {
+        return stringBuilder.toString();
+    }
+}
+
+

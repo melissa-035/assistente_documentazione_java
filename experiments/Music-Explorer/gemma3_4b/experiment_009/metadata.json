@@ -1,0 +1,107 @@
+{
+    "task": "javadoc",
+    "date": "2026-10-09 16:47:32",
+    "repository": "Music-Explorer",
+    "model": "gemma3_4b",
+    "prompt_type": "zero_shot",
+    "prompt_file": "C:\\Users\\Notebook\\Desktop\\musicbridge\\assistente_documentazione_java\\prompts\\javadoc_prompts\\zero_shot.txt",
+    "files_analyzed": 19,
+    "total_runtime_seconds": 7637.989514350891,
+    "files": {
+        "app\\src\\main\\java\\com\\envisionate\\carservice\\CarService.java": {
+            "runtime_seconds": 804.6993627548218,
+            "prompt_length": 5800,
+            "response_length": 7587
+        },
+        "app\\src\\main\\java\\com\\envisionate\\carservice\\screen\\CarEntitiesScreen.java": {
+            "runtime_seconds": 693.409431219101,
+            "prompt_length": 8762,
+            "response_length": 8735
+        },
+        "app\\src\\main\\java\\com\\envisionate\\carservice\\screen\\CarPlayerScreen.java": {
+            "runtime_seconds": 517.7239902019501,
+            "prompt_length": 10268,
+            "response_length": 7456
+        },
+        "app\\src\\main\\java\\com\\envisionate\\carservice\\screen\\MessageScreen.java": {
+            "runtime_seconds": 282.4514226913452,
+            "prompt_length": 1496,
+            "response_length": 2444
+        },
+        "app\\src\\main\\java\\com\\envisionate\\musicinfolders\\BluetoothReceiver.java": {
+            "runtime_seconds": 86.00326657295227,
+            "prompt_length": 858,
+            "response_length": 1130
+        },
+        "app\\src\\main\\java\\com\\envisionate\\musicinfolders\\BroadcastReceiver.java": {
+            "runtime_seconds": 340.18596625328064,
+            "prompt_length": 4625,
+            "response_length": 4838
+        },
+        "app\\src\\main\\java\\com\\envisionate\\musicinfolders\\filesAndFolders.java": {
+            "runtime_seconds": 411.49162316322327,
+            "prompt_length": 2597,
+            "response_length": 4357
+        },
+        "app\\src\\main\\java\\com\\envisionate\\musicinfolders\\Globals.java": {
+            "runtime_seconds": 279.99537420272827,
+            "prompt_length": 1236,
+            "response_length": 1876
+        },
+        "app\\src\\main\\java\\com\\envisionate\\musicinfolders\\itemModel.java": {
+            "runtime_seconds": 156.0974977016449,
+            "prompt_length": 1088,
+            "response_length": 2337
+        },
+        "app\\src\\main\\java\\com\\envisionate\\musicinfolders\\MusicExplorer.java": {
+            "runtime_seconds": 281.5285532474518,
+            "prompt_length": 14876,
+            "response_length": 1828
+        },
+        "app\\src\\main\\java\\com\\envisionate\\musicinfolders\\Play.java": {
+            "runtime_seconds": 480.8987171649933,
+            "prompt_length": 8942,
+            "response_length": 7226
+        },
+        "app\\src\\main\\java\\com\\envisionate\\musicinfolders\\Properties.java": {
+            "runtime_seconds": 447.1738851070404,
+            "prompt_length": 8858,
+            "response_length": 7635
+        },
+        "app\\src\\main\\java\\com\\envisionate\\musicinfolders\\Settings.java": {
+            "runtime_seconds": 437.9491469860077,
+            "prompt_length": 9563,
+            "response_length": 8358
+        },
+        "app\\src\\main\\java\\com\\envisionate\\musicinfolders\\TrackLaunchedActivities.java": {
+            "runtime_seconds": 157.14904499053955,
+            "prompt_length": 1880,
+            "response_length": 3151
+        },
+        "app\\src\\main\\java\\com\\envisionate\\musicinfolders\\Util.java": {
+            "runtime_seconds": 433.036185503006,
+            "prompt_length": 9984,
+            "response_length": 6650
+        },
+        "app\\src\\main\\java\\com\\envisionate\\musicinfolders\\database\\Database.java": {
+            "runtime_seconds": 644.0377805233002,
+            "prompt_length": 6880,
+            "response_length": 9071
+        },
+        "app\\src\\main\\java\\com\\envisionate\\musicinfolders\\database\\DBSchema.java": {
+            "runtime_seconds": 726.7610983848572,
+            "prompt_length": 5848,
+            "response_length": 10002
+        },
+        "app\\src\\main\\java\\com\\envisionate\\musicinfolders\\interfaces\\IMusicExplorer.java": {
+            "runtime_seconds": 406.2381408214569,
+            "prompt_length": 3828,
+            "response_length": 5524
+        },
+        "app\\src\\main\\java\\com\\envisionate\\musicinfolders\\interfaces\\IMusicExplorerPlay.java": {
+            "runtime_seconds": 50.30923795700073,
+            "prompt_length": 382,
+            "response_length": 561
+        }
+    }
+}

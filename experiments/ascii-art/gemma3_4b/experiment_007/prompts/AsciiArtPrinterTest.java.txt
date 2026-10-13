@@ -1,0 +1,89 @@
+Generate javadoc style comments for the following java class.
+Below is an example of a commented method.
+
+Example:
+
+INPUT:
+        public static <T> Enumeration<T> enumeration(final Collection<T> c) {
+            return new Enumeration<T>() {
+                private final Iterator<T> i = c.iterator();
+
+                public boolean hasMoreElements() {
+                    return i.hasNext();
+                }
+
+                public T nextElement() {
+                    return i.next();
+                }
+            };
+        }
+
+OUTPUT:
+/**
+        * Returns an enumeration over the specified collection.  This provides
+        * interoperability with legacy APIs that require an enumeration
+        * as input.
+        *
+        * @param c the collection for which an enumeration is to be returned.
+        * @return an enumeration over the specified collection.
+        * @see Enumeration
+        */
+       public static <T> Enumeration<T> enumeration(final Collection<T> c) {
+           return new Enumeration<T>() {
+               private final Iterator<T> i = c.iterator();
+
+               public boolean hasMoreElements() {
+                   return i.hasNext();
+               }
+
+               public T nextElement() {
+                   return i.next();
+               }
+           };
+       }
+---
+Now generate javadoc comments for the following class:
+
+
+        
+--------------------
+FILE: src\test\java\pl\mgodyn\io\AsciiArtPrinterTest.java
+--------------------
+
+package pl.mgodyn.io;
+
+import org.junit.jupiter.api.Test;
+import pl.mgodyn.asciiart.io.AsciiArtPrinter;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class AsciiArtPrinterTest {
+
+    private final AsciiArtPrinter underTest = new AsciiArtPrinter();
+
+    @Test
+    void givenChar_whenAdding2Row_shouldAddIt3Times() {
+        // given
+        final char ascii = '#';
+
+        // when
+        underTest.add2Row(ascii);
+
+        // then
+        final var expected = "###";
+        assertEquals(expected, underTest.getCurrentBuffer());
+    }
+
+    @Test
+    void givenChar_whenAddingNewRow_shouldHaveNewRow() {
+        // given
+        // when
+        underTest.createNewRow();
+
+        // then
+        var expected = "\n";
+        assertEquals(expected, underTest.getCurrentBuffer());
+    }
+}
+
+

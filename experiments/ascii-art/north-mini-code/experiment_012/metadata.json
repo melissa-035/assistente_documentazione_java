@@ -1,0 +1,77 @@
+{
+    "task": "javadoc",
+    "date": "2026-10-13 10:09:17",
+    "repository": "ascii-art",
+    "model": "north-mini-code",
+    "prompt_type": "zero_shot",
+    "prompt_file": "C:\\Users\\Notebook\\Desktop\\musicbridge\\assistente_documentazione_java\\prompts\\javadoc_prompts\\zero_shot.txt",
+    "files_analyzed": 13,
+    "total_runtime_seconds": 245.71341633796692,
+    "files": {
+        "src\\main\\java\\pl\\mgodyn\\asciiart\\application\\AsciiArtApp.java": {
+            "runtime_seconds": 23.224245309829712,
+            "prompt_length": 633,
+            "response_length": 1176
+        },
+        "src\\main\\java\\pl\\mgodyn\\asciiart\\application\\AsciiArtController.java": {
+            "runtime_seconds": 10.95425820350647,
+            "prompt_length": 738,
+            "response_length": 1596
+        },
+        "src\\main\\java\\pl\\mgodyn\\asciiart\\application\\validator\\AsciiArtValidationChain.java": {
+            "runtime_seconds": 26.879726886749268,
+            "prompt_length": 1306,
+            "response_length": 3330
+        },
+        "src\\main\\java\\pl\\mgodyn\\asciiart\\application\\validator\\ValidationRule.java": {
+            "runtime_seconds": 10.945513486862183,
+            "prompt_length": 345,
+            "response_length": 1046
+        },
+        "src\\main\\java\\pl\\mgodyn\\asciiart\\application\\validator\\rules\\FileExistenceValidationRule.java": {
+            "runtime_seconds": 10.997469902038574,
+            "prompt_length": 713,
+            "response_length": 715
+        },
+        "src\\main\\java\\pl\\mgodyn\\asciiart\\application\\validator\\rules\\FileExtensionValidationRule.java": {
+            "runtime_seconds": 9.266473293304443,
+            "prompt_length": 756,
+            "response_length": 1452
+        },
+        "src\\main\\java\\pl\\mgodyn\\asciiart\\application\\validator\\rules\\LengthValidationRule.java": {
+            "runtime_seconds": 21.75169014930725,
+            "prompt_length": 646,
+            "response_length": 1581
+        },
+        "src\\main\\java\\pl\\mgodyn\\asciiart\\converter\\Converter.java": {
+            "runtime_seconds": 30.86789345741272,
+            "prompt_length": 1360,
+            "response_length": 3092
+        },
+        "src\\main\\java\\pl\\mgodyn\\asciiart\\io\\AsciiArtPrinter.java": {
+            "runtime_seconds": 13.66174602508545,
+            "prompt_length": 687,
+            "response_length": 1494
+        },
+        "src\\main\\java\\pl\\mgodyn\\asciiart\\service\\AsciiArtService.java": {
+            "runtime_seconds": 35.656310081481934,
+            "prompt_length": 1024,
+            "response_length": 3223
+        },
+        "src\\main\\java\\pl\\mgodyn\\asciiart\\utils\\DefaultScreenSizeProvider.java": {
+            "runtime_seconds": 13.490727424621582,
+            "prompt_length": 466,
+            "response_length": 951
+        },
+        "src\\main\\java\\pl\\mgodyn\\asciiart\\utils\\ImageUtils.java": {
+            "runtime_seconds": 29.16927695274353,
+            "prompt_length": 1432,
+            "response_length": 3748
+        },
+        "src\\main\\java\\pl\\mgodyn\\asciiart\\utils\\ScreenSizeProvider.java": {
+            "runtime_seconds": 8.758611679077148,
+            "prompt_length": 313,
+            "response_length": 495
+        }
+    }
+}

@@ -1,0 +1,155 @@
+Generate javadoc type comments for the following code:
+        
+--------------------
+FILE: app\src\main\java\com\envisionate\musicinfolders\database\DBSchema.java
+--------------------
+
+package com.envisionate.musicinfolders.database;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.provider.BaseColumns;
+import android.util.Log;
+
+import java.util.ArrayList;
+
+public class DBSchema {
+
+    private DBSchema() {}
+
+    private static class folders implements BaseColumns {
+        private static final String SQL_CREATE_FOLDERS  = "CREATE TABLE folders (" + folders._ID + " INTEGER PRIMARY KEY," +
+                                                                "parentUri TEXT DEFAULT NULL," +
+                                                                "folderUri TEXT NOT NULL," +
+                                                                "folderName TEXT NOT NULL," +
+                                                                "hash TEXT NOT NULL)";
+        private static final String SQL_DELETE_FOLDERS = "DROP TABLE IF EXISTS folders";
+    }
+
+    private static class tracks implements BaseColumns {
+        private static final String SQL_CREATE_TRACKS  = "CREATE TABLE files (" + tracks._ID + " INTEGER PRIMARY KEY," +
+                                                                "folderId INTEGER NOT NULL," +
+                                                                "fileUri TEXT NOT NULL," +
+                                                                "fileName TEXT NOT NULL," +
+                                                                "isFolder INTEGER NOT NULL," +
+                                                                "FOREIGN KEY(folderId) REFERENCES folders(_id))";
+        private static final String SQL_DELETE_TRACKS = "DROP TABLE IF EXISTS tracks";
+    }
+
+    public static class dbHelper extends SQLiteOpenHelper {
+
+        public static final int DATABASE_VERSION = 1;
+        public static final String DATABASE_NAME = "database.db";
+
+        private static SQLiteDatabase theSQLiteDatabase = null;
+
+        public dbHelper(Context context) {
+            super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        }
+
+        public void sqlCommand(String sql,Object [] parameters) {
+            theSQLiteDatabase.execSQL(sql,parameters);
+        }
+
+        public long insertOne(String tableName,String [] columnNames,String [] values) {
+            ContentValues v = new ContentValues();
+            int k = 0;
+            for ( String s : columnNames )
+                v.put(s,values[k++]);
+            return theSQLiteDatabase.insert(tableName, null, v);
+        }
+
+        public void insertMultiple(String tableName,String [] columnNames,String [][] values) {
+
+            String sql = "";
+            sql += "INSERT INTO " + tableName + "(";
+            for ( String s : columnNames )
+                sql += s + ",";
+            sql = sql.substring(0,sql.length() - 1) + ") ";
+
+            int valuesLength = 0;
+
+            sql += " VALUES ";
+            for ( String [] s2 : values ) {
+                sql += "(";
+                for ( String s3 : s2 ) {
+                    sql += "?,";
+                    valuesLength++;
+                }
+                sql = sql.substring(0,sql.length() - 1) + "),";
+            }
+            sql = sql.substring(0,sql.length() - 1);
+
+            String [] parameters = new String[valuesLength];
+
+            int k = 0;
+            for ( String [] s2 : values ) {
+                for ( String s3 : s2 ) {
+                    parameters[k++] = s3;
+                }
+            }
+
+            try {
+                theSQLiteDatabase.execSQL(sql,parameters);
+            } catch ( Exception ex ) {
+                Log.d("MusicExplorer",ex.getMessage());
+            }
+        }
+
+        public void fetchMultiple(String tableName,String [] columnNames,String sqlClause,ArrayList<String> [] results) {
+
+            String sql = "SELECT ";
+            for ( String s : columnNames )
+                sql += s + ",";
+            sql = sql.substring(0,sql.length() - 1);
+
+            sql += " FROM " + tableName + (null == sqlClause ? "" : sqlClause);
+
+            Cursor theCursor = theSQLiteDatabase.rawQuery(sql,null);
+            while ( theCursor.moveToNext() )
+                for ( int k = 0; k < results.length; k++ )
+                    results[k].add(theCursor.getString(k));
+            theCursor.close();
+        }
+
+        public int sqlQueryInt(String sql,String [] parameters) {
+            Cursor theCursor = theSQLiteDatabase.rawQuery(sql,parameters);
+            theCursor.moveToFirst();
+            int result = theCursor.getInt(0);
+            theCursor.close();
+            return result;
+        }
+
+        public static String sqlQueryString(String sql, String[] parameteres) {
+            Cursor theCursor = theSQLiteDatabase.rawQuery(sql,parameteres);
+            theCursor.moveToFirst();
+            String result = theCursor.getString(0);
+            theCursor.close();
+            return result;
+        }
+
+        public void onCreate(SQLiteDatabase db) {
+            db.execSQL(folders.SQL_CREATE_FOLDERS);
+            db.execSQL(tracks.SQL_CREATE_TRACKS);
+        }
+
+        public void onOpen(SQLiteDatabase db) {
+            theSQLiteDatabase = db;
+        }
+
+        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            db.execSQL(folders.SQL_DELETE_FOLDERS);
+            db.execSQL(tracks.SQL_DELETE_TRACKS);
+            onCreate(db);
+        }
+
+        public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            onUpgrade(db, oldVersion, newVersion);
+        }
+
+    }
+}
+

@@ -1,0 +1,102 @@
+{
+    "task": "javadoc",
+    "date": "2026-10-07 17:20:09",
+    "repository": "ascii-art",
+    "model": "gemma3_4b",
+    "prompt_type": "few_shot",
+    "prompt_file": "C:\\Users\\Notebook\\Desktop\\musicbridge\\assistente_documentazione_java\\prompts\\javadoc_prompts\\few_shot.txt",
+    "files_analyzed": 18,
+    "total_runtime_seconds": 3907.086977005005,
+    "files": {
+        "src\\main\\java\\pl\\mgodyn\\asciiart\\application\\AsciiArtApp.java": {
+            "runtime_seconds": 66.96410608291626,
+            "prompt_length": 1949,
+            "response_length": 827
+        },
+        "src\\main\\java\\pl\\mgodyn\\asciiart\\application\\AsciiArtController.java": {
+            "runtime_seconds": 55.762858390808105,
+            "prompt_length": 2054,
+            "response_length": 930
+        },
+        "src\\main\\java\\pl\\mgodyn\\asciiart\\application\\validator\\AsciiArtValidationChain.java": {
+            "runtime_seconds": 77.82379078865051,
+            "prompt_length": 2622,
+            "response_length": 1848
+        },
+        "src\\main\\java\\pl\\mgodyn\\asciiart\\application\\validator\\ValidationRule.java": {
+            "runtime_seconds": 48.029977560043335,
+            "prompt_length": 1661,
+            "response_length": 753
+        },
+        "src\\main\\java\\pl\\mgodyn\\asciiart\\application\\validator\\rules\\FileExistenceValidationRule.java": {
+            "runtime_seconds": 35.13782358169556,
+            "prompt_length": 2029,
+            "response_length": 606
+        },
+        "src\\main\\java\\pl\\mgodyn\\asciiart\\application\\validator\\rules\\FileExtensionValidationRule.java": {
+            "runtime_seconds": 140.77037644386292,
+            "prompt_length": 2072,
+            "response_length": 1090
+        },
+        "src\\main\\java\\pl\\mgodyn\\asciiart\\application\\validator\\rules\\LengthValidationRule.java": {
+            "runtime_seconds": 52.57600665092468,
+            "prompt_length": 1962,
+            "response_length": 1061
+        },
+        "src\\main\\java\\pl\\mgodyn\\asciiart\\converter\\Converter.java": {
+            "runtime_seconds": 231.06574749946594,
+            "prompt_length": 2676,
+            "response_length": 2702
+        },
+        "src\\main\\java\\pl\\mgodyn\\asciiart\\io\\AsciiArtPrinter.java": {
+            "runtime_seconds": 78.63315200805664,
+            "prompt_length": 2003,
+            "response_length": 1425
+        },
+        "src\\main\\java\\pl\\mgodyn\\asciiart\\service\\AsciiArtService.java": {
+            "runtime_seconds": 76.43474292755127,
+            "prompt_length": 2340,
+            "response_length": 1701
+        },
+        "src\\main\\java\\pl\\mgodyn\\asciiart\\utils\\DefaultScreenSizeProvider.java": {
+            "runtime_seconds": 48.8237624168396,
+            "prompt_length": 1782,
+            "response_length": 525
+        },
+        "src\\main\\java\\pl\\mgodyn\\asciiart\\utils\\ImageUtils.java": {
+            "runtime_seconds": 139.83364582061768,
+            "prompt_length": 2748,
+            "response_length": 2526
+        },
+        "src\\main\\java\\pl\\mgodyn\\asciiart\\utils\\ScreenSizeProvider.java": {
+            "runtime_seconds": 30.714706420898438,
+            "prompt_length": 1629,
+            "response_length": 470
+        },
+        "src\\test\\java\\pl\\mgodyn\\application\\AsciiArtValidationChainTest.java": {
+            "runtime_seconds": 1052.947455406189,
+            "prompt_length": 3684,
+            "response_length": 3859
+        },
+        "src\\test\\java\\pl\\mgodyn\\application\\ValidationRuleTest.java": {
+            "runtime_seconds": 298.37652564048767,
+            "prompt_length": 4150,
+            "response_length": 3810
+        },
+        "src\\test\\java\\pl\\mgodyn\\converter\\ConverterTest.java": {
+            "runtime_seconds": 782.7920598983765,
+            "prompt_length": 3102,
+            "response_length": 2254
+        },
+        "src\\test\\java\\pl\\mgodyn\\io\\AsciiArtPrinterTest.java": {
+            "runtime_seconds": 144.07016611099243,
+            "prompt_length": 2276,
+            "response_length": 1238
+        },
+        "src\\test\\java\\pl\\mgodyn\\io\\ImageUtilsTest.java": {
+            "runtime_seconds": 545.5963339805603,
+            "prompt_length": 5378,
+            "response_length": 5025
+        }
+    }
+}

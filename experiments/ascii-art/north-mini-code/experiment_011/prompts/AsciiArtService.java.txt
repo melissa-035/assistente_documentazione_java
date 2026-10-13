@@ -1,0 +1,86 @@
+Generate javadoc style comments for the following java class.
+Below is an example of a commented method.
+
+Example:
+
+INPUT:
+        public static <T> Enumeration<T> enumeration(final Collection<T> c) {
+            return new Enumeration<T>() {
+                private final Iterator<T> i = c.iterator();
+
+                public boolean hasMoreElements() {
+                    return i.hasNext();
+                }
+
+                public T nextElement() {
+                    return i.next();
+                }
+            };
+        }
+
+OUTPUT:
+/**
+        * Returns an enumeration over the specified collection.  This provides
+        * interoperability with legacy APIs that require an enumeration
+        * as input.
+        *
+        * @param c the collection for which an enumeration is to be returned.
+        * @return an enumeration over the specified collection.
+        * @see Enumeration
+        */
+       public static <T> Enumeration<T> enumeration(final Collection<T> c) {
+           return new Enumeration<T>() {
+               private final Iterator<T> i = c.iterator();
+
+               public boolean hasMoreElements() {
+                   return i.hasNext();
+               }
+
+               public T nextElement() {
+                   return i.next();
+               }
+           };
+       }
+---
+Now generate javadoc comments for the following class:
+
+
+        
+--------------------
+FILE: src\main\java\pl\mgodyn\asciiart\service\AsciiArtService.java
+--------------------
+
+package pl.mgodyn.asciiart.service;
+
+import pl.mgodyn.asciiart.converter.Converter;
+import pl.mgodyn.asciiart.io.AsciiArtPrinter;
+
+import java.awt.image.BufferedImage;
+
+public class AsciiArtService {
+
+    private final Converter converter;
+    private final AsciiArtPrinter printer;
+
+    public AsciiArtService() {
+        this.converter = new Converter();
+        this.printer = new AsciiArtPrinter();
+    }
+
+    public void convert(BufferedImage image) {
+        for (int y = 0; y < image.getHeight(); y++) {
+            for (int x = 0; x < image.getWidth(); x++) {
+                var pixel = image.getRGB(x, y);
+                var ascii = converter.convertPixel2Ascii(pixel);
+                printer.add2Row(ascii);
+            }
+            printer.createNewRow();
+        }
+    }
+
+    public void print() {
+        printer.print();
+    }
+}
+
+

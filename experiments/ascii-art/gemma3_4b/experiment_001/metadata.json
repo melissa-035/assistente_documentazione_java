@@ -1,0 +1,15 @@
+{
+    "task": "readme",
+    "date": "2026-10-07 12:29:00",
+    "LLM_runtime_seconds": 121.95126676559448,
+    "repository": "ascii-art",
+    "model": "gemma3_4b",
+    "prompt_type": "role_prompting",
+    "prompt_file": "prompts\\readme_prompts\\role_prompting.txt",
+    "prompt_length": 3392,
+    "response_length": 2310,
+    "files_analyzed": 18,
+    "classes": 18,
+    "methods": 14,
+    "fields": 1
+}

@@ -1,0 +1,191 @@
+Analyze the Java repository step by step.
+
+First identify the purpose of each class.
+Then analyze relationships between classes.
+Then identify implemented features.
+Finally generate the README.md file.
+
+Show your reasoning before writing the README.
+
+--------------------
+FILE: src\main\java\pl\mgodyn\asciiart\application\AsciiArtApp.java
+--------------------
+
+Class:
+AsciiArtApp
+
+Fields:
+
+
+Methods:
+
+
+--------------------
+FILE: src\main\java\pl\mgodyn\asciiart\application\AsciiArtController.java
+--------------------
+
+Class:
+AsciiArtController
+
+Fields:
+
+
+Methods:
+
+
+--------------------
+FILE: src\main\java\pl\mgodyn\asciiart\application\validator\AsciiArtValidationChain.java
+--------------------
+
+Class:
+AsciiArtValidationChain
+
+Fields:
+- rules: List<ValidationRule>
+
+
+Methods:
+
+
+--------------------
+FILE: src\main\java\pl\mgodyn\asciiart\application\validator\ValidationRule.java
+--------------------
+
+Class:
+None
+
+Fields:
+
+
+Methods:
+
+
+--------------------
+FILE: src\main\java\pl\mgodyn\asciiart\application\validator\rules\FileExistenceValidationRule.java
+--------------------
+
+Class:
+FileExistenceValidationRule
+
+Fields:
+
+
+Methods:
+- isValid(String[] args)
+- getErrorMessage()
+
+
+--------------------
+FILE: src\main\java\pl\mgodyn\asciiart\application\validator\rules\FileExtensionValidationRule.java
+--------------------
+
+Class:
+FileExtensionValidationRule
+
+Fields:
+
+
+Methods:
+- isValid(String[] args)
+- getErrorMessage()
+
+
+--------------------
+FILE: src\main\java\pl\mgodyn\asciiart\application\validator\rules\LengthValidationRule.java
+--------------------
+
+Class:
+LengthValidationRule
+
+Fields:
+
+
+Methods:
+- isValid(String[] args)
+- getErrorMessage()
+
+
+--------------------
+FILE: src\main\java\pl\mgodyn\asciiart\converter\Converter.java
+--------------------
+
+Class:
+Converter
+
+Fields:
+
+
+Methods:
+- convertPixel2Ascii(int pixel)
+
+
+--------------------
+FILE: src\main\java\pl\mgodyn\asciiart\io\AsciiArtPrinter.java
+--------------------
+
+Class:
+AsciiArtPrinter
+
+Fields:
+
+
+Methods:
+- add2Row(char ascii)
+- createNewRow()
+- print()
+- getCurrentBuffer()
+
+
+--------------------
+FILE: src\main\java\pl\mgodyn\asciiart\service\AsciiArtService.java
+--------------------
+
+Class:
+AsciiArtService
+
+Fields:
+
+
+Methods:
+- convert(BufferedImage image)
+- print()
+
+
+--------------------
+FILE: src\main\java\pl\mgodyn\asciiart\utils\DefaultScreenSizeProvider.java
+--------------------
+
+Class:
+DefaultScreenSizeProvider
+
+Fields:
+
+
+Methods:
+- getScreenSize()
+
+
+--------------------
+FILE: src\main\java\pl\mgodyn\asciiart\utils\ImageUtils.java
+--------------------
+
+Class:
+ImageUtils
+
+Fields:
+
+
+Methods:
+
+
+--------------------
+FILE: src\main\java\pl\mgodyn\asciiart\utils\ScreenSizeProvider.java
+--------------------
+
+Class:
+None
+
+Fields:
+
+
+Methods:

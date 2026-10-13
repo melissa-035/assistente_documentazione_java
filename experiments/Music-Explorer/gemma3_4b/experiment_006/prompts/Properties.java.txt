@@ -1,0 +1,318 @@
+Generate javadoc style comments for the following java class.
+Below is an example of a commented method.
+
+Example:
+
+INPUT:
+        public static <T> Enumeration<T> enumeration(final Collection<T> c) {
+            return new Enumeration<T>() {
+                private final Iterator<T> i = c.iterator();
+
+                public boolean hasMoreElements() {
+                    return i.hasNext();
+                }
+
+                public T nextElement() {
+                    return i.next();
+                }
+            };
+        }
+
+OUTPUT:
+/**
+        * Returns an enumeration over the specified collection.  This provides
+        * interoperability with legacy APIs that require an enumeration
+        * as input.
+        *
+        * @param c the collection for which an enumeration is to be returned.
+        * @return an enumeration over the specified collection.
+        * @see Enumeration
+        */
+       public static <T> Enumeration<T> enumeration(final Collection<T> c) {
+           return new Enumeration<T>() {
+               private final Iterator<T> i = c.iterator();
+
+               public boolean hasMoreElements() {
+                   return i.hasNext();
+               }
+
+               public T nextElement() {
+                   return i.next();
+               }
+           };
+       }
+---
+Now generate javadoc comments for the following class:
+
+
+        
+--------------------
+FILE: app\src\main\java\com\envisionate\musicinfolders\Properties.java
+--------------------
+
+package com.envisionate.musicinfolders;
+
+import static com.envisionate.carservice.CarService.ANDROID_AUTO_DISPLAY_FOLDERS;
+import static com.envisionate.musicinfolders.Globals.FOLDER_NOMINAL_VIEW_HEIGHT;
+import static com.envisionate.musicinfolders.Globals.FOLDER_NOMINAL_VIEW_WIDTH;
+import static com.envisionate.musicinfolders.Globals.TRACK_NOMINAL_VIEW_WIDTH;
+import static com.envisionate.musicinfolders.Globals.theMusicExplorer;
+
+import android.content.SharedPreferences;
+import android.net.Uri;
+
+import androidx.documentfile.provider.DocumentFile;
+
+import java.util.Stack;
+import java.util.UUID;
+
+public class Properties {
+
+
+    private static final int AUTO_DISPLAY_COLUMNS = 5;
+
+    private Boolean isInitialSetup = true;
+    private String rootFolder = null;
+    private String rootFolderName = null;
+    private String uuid = null;
+    private int folderViewWidth = FOLDER_NOMINAL_VIEW_WIDTH;
+    private int folderViewHeight = FOLDER_NOMINAL_VIEW_HEIGHT;
+    private  int fileViewWidth = TRACK_NOMINAL_VIEW_WIDTH;
+    private int autoDisplayColumns = AUTO_DISPLAY_COLUMNS;
+    private Boolean autoDisplayFolders = ANDROID_AUTO_DISPLAY_FOLDERS;
+
+    private DocumentFile currentFolder = null;
+    private DocumentFile currentFile = null;
+    private DocumentFile lastPlayedFile = null;
+    private Boolean resumePlayOnStart = true;
+    private Boolean exitOnBTDisconnect = false;
+    private int btPermissionsRequestCount = 0;
+
+    private long currentTrackMS = 0;
+
+    private static SharedPreferences preferences = null;
+
+    Properties(SharedPreferences preferences) {
+        this.preferences = preferences;
+        isInitialSetup = preferences.getBoolean("isInitialSetup",true);
+        rootFolder = preferences.getString("rootFolderName","<click Browse>");
+        rootFolderName = theMusicExplorer.uriToName(Uri.parse(rootFolder));
+        folderViewWidth = preferences.getInt("folderViewWidth",FOLDER_NOMINAL_VIEW_WIDTH);
+        folderViewHeight = preferences.getInt("folderViewHeight",FOLDER_NOMINAL_VIEW_HEIGHT);
+        fileViewWidth = preferences.getInt("fileViewWidth", TRACK_NOMINAL_VIEW_WIDTH);
+
+        try {
+
+            try {
+                currentFolder = DocumentFile.fromTreeUri(theMusicExplorer,Uri.parse(preferences.getString("currentFolder",null)));
+            } catch ( Exception ex ) {
+                currentFolder = null;
+            }
+
+            if ( null == currentFolder ) {
+                currentFolder = DocumentFile.fromTreeUri(theMusicExplorer,Uri.parse(rootFolder));
+            }
+
+            try {
+                currentFile = DocumentFile.fromTreeUri(theMusicExplorer,Uri.parse(preferences.getString("currentFile",null)));
+            } catch ( Exception ex1 ) {
+                currentFile = null;
+            }
+
+            try {
+                lastPlayedFile = DocumentFile.fromTreeUri(theMusicExplorer,Uri.parse(preferences.getString("lastPlayedFile",null)));
+            } catch ( Exception ex1 ) {
+                lastPlayedFile = null;
+            }
+
+        } catch ( Exception ex ) {
+        }
+
+        autoDisplayColumns = preferences.getInt("autoDisplayColumns",AUTO_DISPLAY_COLUMNS);
+        autoDisplayFolders = preferences.getBoolean("autoDisplayFolders", ANDROID_AUTO_DISPLAY_FOLDERS);
+        resumePlayOnStart = preferences.getBoolean("resumePlayOnStart",resumePlayOnStart);
+        exitOnBTDisconnect = preferences.getBoolean("exitOnBTDisconnect",exitOnBTDisconnect);
+        btPermissionsRequestCount = preferences.getInt("btPermissionsRequestCount", btPermissionsRequestCount);
+        currentTrackMS = preferences.getLong("currentTrackMS",-1);
+
+        uuid = preferences.getString("uuid", UUID.randomUUID().toString());
+
+    }
+
+    public void resetPreferences() {
+        isInitialSetup = true;
+        rootFolder = "<click Browse>";
+        rootFolderName = theMusicExplorer.uriToName(Uri.parse(rootFolder));
+        folderViewWidth = FOLDER_NOMINAL_VIEW_WIDTH;
+        folderViewHeight = FOLDER_NOMINAL_VIEW_HEIGHT;
+        fileViewWidth = TRACK_NOMINAL_VIEW_WIDTH;
+        autoDisplayColumns = AUTO_DISPLAY_COLUMNS;
+        autoDisplayFolders = ANDROID_AUTO_DISPLAY_FOLDERS;
+        currentFolder = null;
+        currentFile = null;
+        lastPlayedFile = null;
+        resumePlayOnStart = true;
+        exitOnBTDisconnect = false;
+        /*
+        This property isn't reset
+        btPermissionsRequestCount = 0;
+        */
+        currentTrackMS = -1;
+        uuid = UUID.randomUUID().toString();
+        savePreferences();
+    }
+
+    public void savePreferences() {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("isInitialSetup",isInitialSetup);
+        editor.putString("rootFolderName", rootFolder);
+        editor.putInt("folderViewWidth",folderViewWidth);
+        editor.putInt("folderViewHeight",folderViewHeight);
+        editor.putInt("fileViewWidth",fileViewWidth);
+        editor.putInt("autoDisplayColumns",autoDisplayColumns);
+        editor.putBoolean("autoDisplayFolders",autoDisplayFolders);
+        editor.putString("currentFolder",null == currentFolder ? null : currentFolder.getUri().toString());
+        editor.putString("currentFile",null == currentFile ? null : currentFile.getUri().toString());
+        editor.putString("lastPlayedFile",null == lastPlayedFile ? null : lastPlayedFile.getUri().toString());
+        editor.putBoolean("resumePlayOnStart",resumePlayOnStart);
+        editor.putBoolean("exitOnBTDisconnect",exitOnBTDisconnect);
+        editor.putInt("btPermissionsRequestCount",btPermissionsRequestCount);
+        editor.putLong("currentTrackMS",currentTrackMS);
+
+        editor.putString("uuid",uuid);
+
+        editor.commit();
+    }
+
+    public void setIsInitialSetup(Boolean v) {
+        isInitialSetup = v;
+    }
+
+    public Boolean getIsInitialSetup() {
+        return isInitialSetup;
+    }
+
+    public void setRootFolder(Uri uri) {
+        rootFolder = uri.toString();
+        rootFolderName = theMusicExplorer.uriToName(uri);
+        savePreferences();
+    }
+
+    public String getRootFolder() {
+        return rootFolder;
+    }
+
+    public String getRootFolderName() {
+        return rootFolderName;
+    }
+
+    public int getAutoDisplayColumns() {
+        return autoDisplayColumns;
+    }
+
+    public void setAutoDisplayColumns(int v) {
+        autoDisplayColumns = v;
+        savePreferences();
+    }
+
+    public Boolean getAutoDisplayFolders() {
+        return autoDisplayFolders;
+    }
+
+    public void setAutoDisplayFolders(Boolean v) {
+        autoDisplayFolders = v;
+        savePreferences();
+    }
+
+    public void setFolderViewWidth(int v) {
+        folderViewWidth = v;
+    }
+
+    public int getFolderViewWidth() {
+        return folderViewWidth;
+    }
+
+    public void setFolderViewHeight(int v) {
+        folderViewHeight = v;
+    }
+
+    public int getFolderViewHeight() {
+        return folderViewHeight;
+    }
+
+    public void setFileViewWidth(int v) {
+        fileViewWidth = v;
+    }
+
+    public int getFileViewWidth() {
+        return fileViewWidth;
+    }
+
+    public void setCurrentFolder(DocumentFile theFolder) {
+        currentFolder = theFolder;
+        savePreferences();
+    }
+
+    public DocumentFile getCurrentFolder() {
+        return currentFolder;
+    }
+
+    public void setCurrentFile(String s) {
+        setCurrentFile(DocumentFile.fromTreeUri(theMusicExplorer,Uri.parse(s)));
+    }
+
+    public void setCurrentFile(DocumentFile theFile) {
+        currentFile = theFile;
+        savePreferences();
+    }
+
+    public DocumentFile getCurrentFile() {
+        return currentFile;
+    }
+
+    public void setLastPlayedFile(DocumentFile theFile) {
+        lastPlayedFile = theFile;
+        savePreferences();
+    }
+
+    public void setExitOnBTDisconnect(Boolean v) {
+        exitOnBTDisconnect = v;
+        savePreferences();
+    }
+
+    public Boolean getExitOnBTDisconnect() {
+        return exitOnBTDisconnect;
+    }
+
+    public void setBtPermissionsRequestCount(int v) {
+        btPermissionsRequestCount = v;
+        savePreferences();
+    }
+
+    public int getBtPermissionsRequestCount() {
+        return btPermissionsRequestCount;
+    }
+
+    public void setResumePlayOnStart(Boolean v) {
+        resumePlayOnStart = v;
+        savePreferences();
+    }
+
+    public Boolean getResumePlayOnStart() {
+        return resumePlayOnStart;
+    }
+    public void setCurrentTrackMS(long v) {
+        currentTrackMS = v;
+    }
+
+    public long getCurrentTrackMS() {
+        if (  null == lastPlayedFile )
+            currentTrackMS = -1;
+        else if ( ! lastPlayedFile.getName().equals(currentFile.getName()) )
+            currentTrackMS = -1;
+        return currentTrackMS;
+    }
+
+}
+
+
